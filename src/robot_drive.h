@@ -4,13 +4,13 @@
 
 #define RC_BAUD_RATE 38400
 #define RC_TIMEOUT 1000 //1s of coms timeout
-#define RC_MAX_MOTOR_SPEED 50
+#define RC_MAX_MOTOR_SPEED 50000
 
-#define RC_LEFT_PORT Serial1
+#define RC_LEFT_PORT Serial2
 #define RC_LEFT_RX 26
 #define RC_LEFT_TX 27
 
-#define RC_RIGHT_PORT Serial2
+#define RC_RIGHT_PORT Serial1
 #define RC_RIGHT_RX 16
 #define RC_RIGHT_TX 17
 
