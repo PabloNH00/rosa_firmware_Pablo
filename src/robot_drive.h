@@ -4,7 +4,7 @@
 
 #define RC_BAUD_RATE 38400
 #define RC_TIMEOUT 1000 //1s of coms timeout
-#define RC_MAX_MOTOR_SPEED 50000
+#define RC_MAX_MOTOR_SPEED 50000 //TODO max counts/sec
 
 #define RC_LEFT_PORT Serial2
 #define RC_LEFT_RX 26
@@ -19,6 +19,7 @@ class RobotDrive{
     RoboClaw rc_left =  RoboClaw(&RC_LEFT_PORT, RC_TIMEOUT);
     RoboClaw rc_right = RoboClaw(&RC_RIGHT_PORT,RC_TIMEOUT);
     bool move_commands_enabled = true;
+
   public:
     void setup();
     void loop();
