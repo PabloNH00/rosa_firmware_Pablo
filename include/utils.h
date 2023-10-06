@@ -8,6 +8,7 @@ class TIMER{
   TIMER(uint16_t time):_time(time){
     lt=millis();
   }
+  //returns true if the time exceeds the conf time
   bool operator()(){
     if(millis()-lt>_time){
       lt=millis();

@@ -30,10 +30,15 @@ void RobotDrive::set_velocity(float vx, float vy, float vr)
     float max=0;
     for(auto v:vm)max=fabs(v)>max?fabs(v):max;
     if(max>1.0) for(auto &v:vm)v/=max;
-    //scale to the roboclaw units:
+    
+    
+    //scale to the roboclaw units: transform % to encoders speeds
     for(auto &v:vm)v*=RC_MAX_MOTOR_SPEED;
     int32_t vm_int32[4]={vm[0],vm[1],vm[2],vm[3]};
     
-    rc_left.SpeedM1M2(RC_ID,vm[0],vm[1]);
-    rc_right.SpeedM1M2(RC_ID,vm[2],vm[3]);
+
+    //TODO: espera un int32 con una indicación del número de pulsos por segundo
+    //TODO: debería almacenarse y luego gestionar la comunicacion al ritmo correcto
+    rc_left.SpeedM1M2(RC_ID,vm_int32[0],vm_int32[1]);
+    rc_right.SpeedM1M2(RC_ID,vm_int32[2],vm_int32[3]);
 }
