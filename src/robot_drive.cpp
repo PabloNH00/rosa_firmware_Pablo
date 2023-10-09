@@ -5,40 +5,40 @@ void RobotDrive::setup(){
  RC_RIGHT_PORT.begin(RC_BAUD_RATE, SERIAL_8N1, RC_RIGHT_RX, RC_RIGHT_TX);
 }
 void RobotDrive::loop(){
-  static TIMER update_rcs(500); 
-  int v[4]{};
-  if(update_rcs()){
-   /* v[0] = rc_left.ReadSpeedM1(RC_ID);
-    v[1] = rc_left.ReadSpeedM2(RC_ID);
-    v[2] = rc_right.ReadSpeedM1(RC_ID);
-    v[3] = rc_right.ReadSpeedM2(RC_ID);*/
-  
+  static TIMER read_timer(50), command_timer(50); //20 times per sec
+  if(command_timer()){
+    rc_left.SpeedM1M2(RC_ID,
+      target_velocity[m1_left].t_uint, target_velocity[m2_left].t_uint );
+    rc_right.SpeedM1M2(RC_ID,
+      target_velocity[m1_right].t_uint, target_velocity[m2_right].t_uint );
+  } else
+  if(read_timer()){
+    rc_left.ReadISpeeds(RC_ID, 
+      current_velocity[m1_left].t_uint, current_velocity[m2_left].t_uint );
+    rc_right.ReadISpeeds(RC_ID, 
+      current_velocity[m1_right].t_uint, current_velocity[m2_right].t_uint );
   }
+
 }
 void RobotDrive::emergency_stop(){
+    for (auto &v:target_velocity)v.t_int=0;
     rc_left.SpeedM1M2(RC_ID,0,0);
     rc_right.SpeedM1M2(RC_ID,0,0);
 }
 void RobotDrive::set_velocity(float vx, float vy, float vr)
 {
     if(!move_commands_enabled)return; //nothing is executed
-    Serial.println("MOVE********************");
+    
     //compute vx, vy, vr
-  
     float vm[] = { -vx +vy  +vr, +vx +vy  -vr, -vx +vy  -vr, +vx +vy  +vr};
     
     float max=0;
     for(auto v:vm)max=fabs(v)>max?fabs(v):max;
     if(max>1.0) for(auto &v:vm)v/=max;
     
-    
     //scale to the roboclaw units: transform % to encoders speeds
     for(auto &v:vm)v*=RC_MAX_MOTOR_SPEED;
-    int32_t vm_int32[4]={vm[0],vm[1],vm[2],vm[3]};
-    
+    //store as integers in counts per sec
+    for(int i=0;i<4;i++)target_velocity[0].t_int=vm[i];
 
-    //TODO: espera un int32 con una indicación del número de pulsos por segundo
-    //TODO: debería almacenarse y luego gestionar la comunicacion al ritmo correcto
-    rc_left.SpeedM1M2(RC_ID,vm_int32[0],vm_int32[1]);
-    rc_right.SpeedM1M2(RC_ID,vm_int32[2],vm_int32[3]);
 }

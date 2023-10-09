@@ -24,40 +24,25 @@ void setup()
  
  void loop()
  {
-    static TIMER rc_update(200); //velocoty commands update each 200 ms
     handle_serial_port();
     robot.loop();
     gamepad.loop();
-    if(gamepad.is_controlling()){ //hay que implementar que cuando se suelte el control... se pare (detecte el comando vel 0)
-        //debug
-        Serial.println("Is controlling");
-        robot.enable_move_commands();
-        if(gamepad.emergency_stop()){
-            //stop with brake
-            robot.emergency_stop();
-            Serial.println("EMERG");
-        }else{
-            if(rc_update()){
-                robot.set_velocity( -gamepad.get_ry(), //forward
-                                -gamepad.get_rx(), //sideward
-                                gamepad.get_ly()  //rotation
+    
+    robot.enable_move_commands();
+    if(gamepad.is_controlling()){ 
+        if(gamepad.emergency_stop())robot.emergency_stop();
+        else{
+            robot.set_velocity( 
+                -gamepad.get_ry(), //forward
+                -gamepad.get_rx(), //sideward
+                gamepad.get_ly()  //rotation
                 );
-                char txt[100];
-                sprintf(txt,"%5.2f %5.2f %5.2f",-gamepad.get_ry(),-gamepad.get_rx(),gamepad.get_ly());
-                Serial.println(txt);
-            }
-
+            //char txt[100];
+            //sprintf(txt,"%5.2f %5.2f %5.2f",-gamepad.get_ry(),-gamepad.get_rx(),gamepad.get_ly());
+            //Serial.println(txt);
         }
-
         robot.disable_move_commands();//only the gamepad moves the robot
     }
-    else{
-        //debug
-        //Serial.println("PC ctrl");
-        robot.enable_move_commands();
-    } 
-    //debug delay
-    delay(10);
 
  }
 

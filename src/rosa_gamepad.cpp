@@ -7,7 +7,7 @@ void ROSAgamepad::setup(){//a global object Ps3Controller is intantiated with th
           Ps3.begin(); 
 }
 inline float normalize_int8(int8_t val){
-    return abs(val)<10?0:val/100.0F;
+    return abs(val)<10?0:val/128.0F;
 }
 void ROSAgamepad::loop(){
     //a global object Ps3Controller is intantiated with the include
@@ -21,18 +21,17 @@ void ROSAgamepad::loop(){
 }
 //checks buttons and joytick that enables de manual control
 void ROSAgamepad::update_capture_control(){
-    static int counts=0;
+    
     manual_control=false;
     if(lx||ly||rx||ry)manual_control = true;
     //trigers disable any movement command
     if( Ps3.data.button.l2 && Ps3.data.button.r2) manual_control = true;
-     if( Ps3.data.button.cross) manual_control = true;
-     if(manual_control)
-        counts=100;
-    if((counts>0)&&(!manual_control)){
-            counts--;
-            manual_control=true;
-    }
- 
+    //emergency button disables any movement command and stops the robot
+    if( Ps3.data.button.cross) manual_control = true;
+
+    //code sniplet to delay the mode switch manual->auto. 
+    static  ulong lt=0;
+    if(manual_control)lt=millis();
+    if((millis()-lt<SWITCH_DELAY)&&(!manual_control)) manual_control=true;
 }
 

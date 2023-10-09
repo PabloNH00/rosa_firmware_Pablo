@@ -2,7 +2,8 @@
 #include <Arduino.h>
 #include <Ps3Controller.h>
 
-struct ROSAgamepad{
+#define SWITCH_DELAY 1000  //time with manual control after gamepad release
+class ROSAgamepad{
     float lx=0.0F, ly=0.0F, rx=0.0F, ry=0.0F;
     bool manual_control = false;
     void update_capture_control(); //chack conditions to capture control
