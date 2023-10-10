@@ -30,6 +30,10 @@ class RobotDrive{
     //internal state vars
     bool move_commands_enabled = true;
     int32_u current_velocity[4]{};
+    float battery_voltage=0;
+    int32_u encoder_counts[4]{};
+    int32_u x_pos,y_pos,yaw;
+    //commanded
     int32_u target_velocity[4]{};
 
   public:

@@ -42,3 +42,14 @@ void RobotDrive::set_velocity(float vx, float vy, float vr)
     for(int i=0;i<4;i++)target_velocity[0].t_int=vm[i];
 
 }
+/*
+notas del robogait:
+   read encoder counts: 78
+   reset encoder counters: 20
+   M1M2speed : 37
+   readnecoder Ispeed: 79
+   read intensitites: 49
+   read batery voltage: 24
+   read status: 90
+   
+*/
