@@ -42,10 +42,49 @@ void RobotDrive::set_velocity(float vx, float vy, float vr)
     for(int i=0;i<4;i++)target_velocity[0].t_int=vm[i];
 
 }
+//if needed it is possible to deal  with overflows and unerflows (use ReqdM1Encoder instead)
+//overflow, underflow will happen after 84Km so probably it is not neccesary
+//it also computes in m the displacement of each wheel
+void RobotDrive::read_encoders(){
+  int32_u enc[4];
+  float rev[4]{}; //revolutions
+  if(rc_left.ReadEncoders(RC_ID, enc[0].t_uint,enc[1].t_uint) && 
+     rc_right.ReadEncoders(RC_ID, enc[2].t_uint,enc[3].t_uint)){
+     //odometry is computed, and enc counts updated only if all readings are ok 
+     for(int i=0;i<4;i++){
+        rev[i]=(enc[i].t_int-encoder_counts[i].t_int);
+    
+        encoder_counts[i]=enc[i];
+     }
+     //from encoder counts to rads 
+     for(auto &r:rev)r*=CPR_2_RADS;
+     
+     float forward=MEC_RAD*(rev[0]+rev[1]+rev[2]+rev[3])/4;
+
+     float lateral=MEC_RAD*(-rev[0]+rev[1]+rev[2]-rev[3])/4;
+     float rotation=MEC_RAD*(-rev[0]+rev[1]+rev[2]-rev[3])/(4*(LX+LY));
+     //TODO... se actualiza la odometria x_pos, ypos_yaw
+   
+
+  }
+
+}
+//reset odometry (0, 0, 0), and the roboclaw counts
+void RobotDrive::reset_odometry(){
+  rc_left.ResetEncoders(RC_ID);
+  rc_right.ResetEncoders(RC_ID);
+  for(auto &enc:encoder_counts)enc.t_int=0;
+  x_pos=y_pos=yaw=int32_u{0};
+}
+/*
+vx = r*(w1+w2+w3+w4)/4
+vy = r*(-w1+w2+w3-w4)/4
+wz = r*(-w1+w2-w3+w4)/4(lx+ly)
+*/
+
 /*
 notas del robogait:
-   read encoder counts: 78
-   reset encoder counters: 20
+   
    M1M2speed : 37
    readnecoder Ispeed: 79
    read intensitites: 49
