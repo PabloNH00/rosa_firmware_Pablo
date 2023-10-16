@@ -8,7 +8,10 @@
 //encoders 300 cpr  si es enc simple 15K si x4 60K
 #define ENC_CPR  300
 #define REDUCTION 40
-#define MEC_RAD 0.15F
+#define MEC_RAD 0.076F
+#define ROSA_LENGTH 0.68181F
+#define ROSA_WIDTH 0.68181F
+
 #define RC_MAX_MOTOR_SPEED 60000 //TODO max counts/sec
 #define CPR_2_RADS (3.1415F*2.0F/(ENC_CPR*REDUCTION))
 #define RC_LEFT_PORT Serial2
@@ -35,7 +38,7 @@ class RobotDrive{
     int32_u current_velocity[4]{};
     float battery_voltage=0;
     int32_u encoder_counts[4]{};
-    int32_u x_pos,y_pos,yaw;
+    float x_pos,y_pos,yaw;
     //commanded
     int32_u target_velocity[4]{};
     void read_encoders();

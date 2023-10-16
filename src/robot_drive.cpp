@@ -59,12 +59,14 @@ void RobotDrive::read_encoders(){
      //from encoder counts to rads 
      for(auto &r:rev)r*=CPR_2_RADS;
      
-     float forward=MEC_RAD*(rev[0]+rev[1]+rev[2]+rev[3])/4;
+     float d_xr=MEC_RAD*(-rev[0]+rev[1]-rev[2]+rev[3])/4;
 
-     float lateral=MEC_RAD*(-rev[0]+rev[1]+rev[2]-rev[3])/4;
-     float rotation=MEC_RAD*(-rev[0]+rev[1]+rev[2]-rev[3])/(4*(LX+LY));
-     //TODO... se actualiza la odometria x_pos, ypos_yaw
-   
+     float d_yr=MEC_RAD*(rev[0]+rev[1]+rev[2]+rev[3])/4;
+     float d_yaw=MEC_RAD*(-rev[0]+rev[1]+rev[2]-rev[3])/(4*(ROSA_LENGTH+ROSA_WIDTH));
+     //odometry update x_pos, y_pos, yaw
+     x_pos+= d_xr * cos( yaw + d_yaw/2 )-d_yr * sin( yaw + d_yaw/2);
+     y_pos+= d_xr * sin( yaw + d_yaw/2 )+d_yr * cos( yaw + d_yaw/2);
+     yaw += d_yaw;
 
   }
 
@@ -74,13 +76,8 @@ void RobotDrive::reset_odometry(){
   rc_left.ResetEncoders(RC_ID);
   rc_right.ResetEncoders(RC_ID);
   for(auto &enc:encoder_counts)enc.t_int=0;
-  x_pos=y_pos=yaw=int32_u{0};
+  x_pos=y_pos=yaw=0.0F;
 }
-/*
-vx = r*(w1+w2+w3+w4)/4
-vy = r*(-w1+w2+w3-w4)/4
-wz = r*(-w1+w2-w3+w4)/4(lx+ly)
-*/
 
 /*
 notas del robogait:
