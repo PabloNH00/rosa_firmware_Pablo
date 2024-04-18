@@ -30,6 +30,11 @@ union int32_u{
   float t_float;
 };
 enum rosa_motors : char{m1_left, m2_left, m1_right, m2_right};
+struct Odometry{
+  float x_pos=0;
+  float y_pos=0;
+  float yaw=0;
+};
 class RobotDrive{
     RoboClaw rc_left =  RoboClaw(&RC_LEFT_PORT, RC_TIMEOUT);
     RoboClaw rc_right = RoboClaw(&RC_RIGHT_PORT,RC_TIMEOUT);
@@ -50,4 +55,5 @@ class RobotDrive{
     void set_velocity(float vx, float vy, float vr);
     void emergency_stop();
    void reset_odometry();
+   Odometry get_odometry(){return Odometry{x_pos, y_pos, yaw};}
 };

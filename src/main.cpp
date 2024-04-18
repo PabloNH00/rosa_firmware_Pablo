@@ -24,43 +24,44 @@ void setup()
  
  void loop()
  {
-    static TIMER led_timer(ROSA_HEARTBEAT), update_ros(ROS_UPDATE_INFO_RATE);
+    static TIMER heart_beat(ROSA_HEARTBEAT), update_ros(ROS_UPDATE_INFO_RATE);
     handle_serial_port();
     robot.loop();
 
-    if(led_timer())//do something to show that the uc is alive
+    if(heart_beat())//do something to show that the uc is alive
     {
 
     }
     if(update_ros())//send odometry and status data to ros2
     {
-
+        //deberia incluir un timeout que detecte si hay comunicacion
+        auto [x, y,yaw] = robot.get_odometry();
+        send_message(odometry_message(x,y,yaw));
+        //send_message(debug_text_message("HOLA \n"));
     }
     
  }
 
 void handle_serial_port(){
 static ROSAmens::MsgReader reader; //the reader must be persistent
-
 while (Serial.available()) {
     if (reader.add_uchar(Serial.read())) {
         auto m = reader.getMessage();
-        /*switch (m.id) {
-            case 10: {
-            //message of id 10 interpretation, get values
-            m.read_cstring(buffer, 100);
-            int value = m.read<int>();
-            m.read_array<int>(vector, 3);
-            //do something with that values...
-        }break;
-        case 2:
-            //message 2 interpretation
-            //...
+        switch (m.id) {
+            case ROSA_CMD_VEL: {
+                //message of CMD_VEL interpretation, get values
+                auto vx=m.read<float>(), vy=m.read<float>(), vr=m.read<float>();
+                //do something with that values...
+                robot.set_velocity(vx,vy,vr);
+            }break;
+        case ROSA_RESET_ODOMETRY:
+            //message that resets the robot odometry
+            robot.reset_odometry();
         break;
         default:
             //unknown message
             ;
-        }*/
+        }
     }
 }//while
 }
