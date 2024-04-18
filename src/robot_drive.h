@@ -1,6 +1,6 @@
 #pragma once
 #include <Arduino.h>
-#include <RoboClaw.h>
+#include "RoboClaw.h"
 
 #define RC_BAUD_RATE 38400
 #define RC_TIMEOUT 1000 //1s of coms timeout

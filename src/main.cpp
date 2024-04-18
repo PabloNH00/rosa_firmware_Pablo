@@ -1,19 +1,19 @@
 #include <Arduino.h>
 #include <robot_drive.h>
+#include "rosa_defs.h"
 #include "rosa_gamepad.h"
-#include "spslib.h"
 #include "utils.h"
 
- //ROSA DEFINITIONS
-#define COMMANDS_BAUD_RATE 38400
 
-
-typedef SPS::Message<> ROSAmens;
  //ROSA COMPONENTS
 RobotDrive robot;
 ROSAgamepad gamepad;
 
 void handle_serial_port();
+void handle_gamepad();
+inline void send_message(const ROSAmens &m){
+    Serial.write(m.data,m.datagram_size());
+}
 void setup()
  {
 
@@ -24,26 +24,19 @@ void setup()
  
  void loop()
  {
+    static TIMER led_timer(ROSA_HEARTBEAT), update_ros(ROS_UPDATE_INFO_RATE);
     handle_serial_port();
     robot.loop();
-    gamepad.loop();
-    
-    robot.enable_move_commands();
-    if(gamepad.is_controlling()){ 
-        if(gamepad.emergency_stop())robot.emergency_stop();
-        else{
-            robot.set_velocity( 
-                -gamepad.get_ry(), //forward
-                -gamepad.get_rx(), //sideward
-                gamepad.get_ly()  //rotation
-                );
-            //char txt[100];
-            //sprintf(txt,"%5.2f %5.2f %5.2f",-gamepad.get_ry(),-gamepad.get_rx(),gamepad.get_ly());
-            //Serial.println(txt);
-        }
-        robot.disable_move_commands();//only the gamepad moves the robot
-    }
 
+    if(led_timer())//do something to show that the uc is alive
+    {
+
+    }
+    if(update_ros())//send odometry and status data to ros2
+    {
+
+    }
+    
  }
 
 void handle_serial_port(){
@@ -70,5 +63,32 @@ while (Serial.available()) {
         }*/
     }
 }//while
+}
+/*****************************************
+ Reads the gamepad if present. If the gamepad is in control
+ then disables the command movements and takes control
+ otherwise it only updates the gamepad info
+*****************************************/
+void handle_gamepad()
+{
+    gamepad.loop();
+    robot.enable_move_commands();
+    if(gamepad.is_controlling()){ 
+        if(gamepad.emergency_stop())robot.emergency_stop();
+        else{
+            robot.set_velocity( 
+                -gamepad.get_ry(), //forward
+                -gamepad.get_rx(), //sideward
+                gamepad.get_ly()  //rotation
+                );
+            #ifdef DEBUG_GAME_PAD
+            
+            char txt[100];
+            sprintf(txt,"%5.2f %5.2f %5.2f",-gamepad.get_ry(),-gamepad.get_rx(),gamepad.get_ly());
+            send_message(debug_text_message(txt));
+            #endif
+        }
+        robot.disable_move_commands();//only the gamepad moves the robot
+    }
 }
 
