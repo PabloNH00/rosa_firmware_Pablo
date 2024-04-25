@@ -26,6 +26,7 @@ void setup()
  {
     static TIMER heart_beat(ROSA_HEARTBEAT), update_ros(ROS_UPDATE_INFO_RATE);
     handle_serial_port();
+    handle_gamepad();
     robot.loop();
 
     if(heart_beat())//do something to show that the uc is alive
@@ -36,8 +37,9 @@ void setup()
     {
         //deberia incluir un timeout que detecte si hay comunicacion
         auto [x, y,yaw] = robot.get_odometry();
-        send_message(odometry_message(x,y,yaw));
-        //send_message(debug_text_message("HOLA \n"));
+        Serial.printf("x:%5.2F y:%5.2f yaw:%5.2F \n",x,y,yaw);
+        //send_message(odometry_message(x,y,yaw));
+        
     }
     
  }
@@ -78,9 +80,9 @@ void handle_gamepad()
         if(gamepad.emergency_stop())robot.emergency_stop();
         else{
             robot.set_relative_velocity( 
-                -gamepad.get_ry(), //forward
-                -gamepad.get_rx(), //sideward
-                gamepad.get_ly()  //rotation
+                gamepad.get_lx(), //forward
+                gamepad.get_ly(), //sideward
+                gamepad.get_ry()  //rotation
                 );
             #ifdef DEBUG_GAME_PAD
             

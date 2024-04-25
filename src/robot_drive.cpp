@@ -13,10 +13,13 @@ void RobotDrive::loop(){
       target_velocity[m1_right].t_uint, target_velocity[m2_right].t_uint );
   } else
   if(read_timer()){
+    read_encoders();
+    /*
     rc_left.ReadISpeeds(RC_ID, 
       current_velocity[m1_left].t_uint, current_velocity[m2_left].t_uint );
     rc_right.ReadISpeeds(RC_ID, 
       current_velocity[m1_right].t_uint, current_velocity[m2_right].t_uint );
+      */
   }
 
 }
@@ -28,17 +31,18 @@ void RobotDrive::emergency_stop(){
 //verified with multiple tests IK->FK->IK
 //the loss of gdl have to be considered inb order to correctly test the IK
 inline void RobotDrive::FK(const float vm[4], float &vx, float &vy, float &vr)
-{
-    vx=MEC_RAD*(-vm[0]+vm[1]-vm[2]+vm[3])/4;
-    vy=MEC_RAD*(vm[0]+vm[1]+vm[2]+vm[3])/4;
-    vr=MEC_RAD*(vm[0]-vm[1]-vm[2]+vm[3])/(4*LXY);
+{ 
+  //VERIFICAR DE NUEVO
+   vx=MEC_RAD*(vm[0]+vm[1]+vm[2]+vm[3])/4;
+    vr=MEC_RAD*(-vm[0]+vm[1]+vm[2]-vm[3])/4;
+    vy=MEC_RAD*(vm[0]-vm[1]+vm[2]-vm[3])/(4*LXY);
 }
 inline void RobotDrive::IK(const float &vx, const float &vy, const float &vr, float vm[4])
 {
-  vm[0] = (-vx +vy  +vr*LXY)/MEC_RAD; 
-  vm[1] = (+vx +vy  -vr*LXY)/MEC_RAD; 
-  vm[2] = (-vx +vy  -vr*LXY)/MEC_RAD; 
-  vm[3] = (+vx +vy  +vr*LXY)/MEC_RAD;
+  vm[0] = (vx -vr  +vy*LXY)/MEC_RAD; //vy+ ->vx+
+  vm[1] = (vx +vr  -vy*LXY)/MEC_RAD; //vx+ ->vy-
+  vm[2] = (vx +vr  +vy*LXY)/MEC_RAD; 
+  vm[3] = (vx -vr  -vy*LXY)/MEC_RAD;
 }
 //Sets the robot speed proportional to the maximun speed (-1.0, 1.0)
 void RobotDrive::set_relative_velocity(float vx, float vy, float vr)
@@ -49,15 +53,17 @@ void RobotDrive::set_relative_velocity(float vx, float vy, float vr)
     float vm[4] ; IK(vx*MAX_FORWARD_SPEED, vy*MAX_LATERAL_SPEED, vr*MAX_ROT_SPEED, vm);
 
     //normalization to RC_MAX_MOTOR_SPEED
-    float max=0;
-    for(auto v:vm)max=fabs(v)>max?fabs(v):max;
-    if(max>MAX_MOTOR_SPEED) for(auto &v:vm)v/=max;
+    //float max=0;
+    //for(auto v:vm)max=fabs(v)>max?fabs(v):max;
+    //if(max>MAX_MOTOR_SPEED) for(auto &v:vm)v/=max;
 
     //scale to the roboclaw units: transform rads/sec to encoders speeds
-    for(auto &v:vm)v*=RADS_2_CPR;
+    for(auto &v:vm)v*=RADS_2_CPR*factor_speed;
 
     //store as integers in counts per sec
-    for(int i=0;i<4;i++)target_velocity[0].t_int=static_cast<int32_t>(vm[i]);
+    for(int i=0;i<4;i++)target_velocity[i].t_int=static_cast<int32_t>(vm[i]);
+    
+          
 
 }
 //Sets the robot speed proportional to the maximun speed (-1.0, 1.0)
@@ -85,6 +91,7 @@ void RobotDrive::read_encoders(){
   if(rc_left.ReadEncoders(RC_ID, encs[0].t_uint,encs[1].t_uint) && 
      rc_right.ReadEncoders(RC_ID, encs[2].t_uint,encs[3].t_uint)){
      //odometry is computed, and enc counts updated only if all readings are ok 
+     Serial.printf("m1:%d\n",encs[0].t_int);
      for(int i=0;i<4;i++){
         angs[i]=(encs[i].t_int-encoder_counts[i].t_int);
         encoder_counts[i]=encs[i];

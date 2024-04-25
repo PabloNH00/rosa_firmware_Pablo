@@ -15,12 +15,12 @@ constexpr float LX = ROSA_LENGTH/2.F;
 constexpr float LY = ROSA_WIDTH/2.F;
 constexpr float LXY = LX+LY;
 #define MAX_MOTOR_SPEED 8.0F //max rads/sec
-#define MAX_FORWARD_SPEED 1.5F //m/s
-#define MAX_LATERAL_SPEED 1.5F  //m/s
+#define MAX_FORWARD_SPEED 2.5F //m/s
+#define MAX_LATERAL_SPEED 2.5F  //m/s
 #define MAX_ROT_SPEED 4.0F //rad/s
 constexpr float CPR_2_RADS = 3.1415F*2.0F/(ENC_CPR*REDUCTION);
 constexpr float RADS_2_CPR = 1.0F/CPR_2_RADS;
-
+constexpr float factor_speed = 1;
 #define RC_LEFT_PORT Serial2
 #define RC_LEFT_RX 26
 #define RC_LEFT_TX 27
