@@ -25,51 +25,81 @@ void RobotDrive::emergency_stop(){
     rc_left.SpeedM1M2(RC_ID,0,0);
     rc_right.SpeedM1M2(RC_ID,0,0);
 }
-void RobotDrive::set_velocity(float vx, float vy, float vr)
+//verified with multiple tests IK->FK->IK
+//the loss of gdl have to be considered inb order to correctly test the IK
+inline void RobotDrive::FK(const float vm[4], float &vx, float &vy, float &vr)
+{
+    vx=MEC_RAD*(-vm[0]+vm[1]-vm[2]+vm[3])/4;
+    vy=MEC_RAD*(vm[0]+vm[1]+vm[2]+vm[3])/4;
+    vr=MEC_RAD*(vm[0]-vm[1]-vm[2]+vm[3])/(4*LXY);
+}
+inline void RobotDrive::IK(const float &vx, const float &vy, const float &vr, float vm[4])
+{
+  vm[0] = (-vx +vy  +vr*LXY)/MEC_RAD; 
+  vm[1] = (+vx +vy  -vr*LXY)/MEC_RAD; 
+  vm[2] = (-vx +vy  -vr*LXY)/MEC_RAD; 
+  vm[3] = (+vx +vy  +vr*LXY)/MEC_RAD;
+}
+//Sets the robot speed proportional to the maximun speed (-1.0, 1.0)
+void RobotDrive::set_relative_velocity(float vx, float vy, float vr)
 {
     if(!move_commands_enabled)return; //nothing is executed
     
     //compute vx, vy, vr
-    float vm[] = { -vx +vy  +vr, +vx +vy  -vr, -vx +vy  -vr, +vx +vy  +vr};
-    
+    float vm[4] ; IK(vx*MAX_FORWARD_SPEED, vy*MAX_LATERAL_SPEED, vr*MAX_ROT_SPEED, vm);
+
+    //normalization to RC_MAX_MOTOR_SPEED
     float max=0;
     for(auto v:vm)max=fabs(v)>max?fabs(v):max;
-    if(max>1.0) for(auto &v:vm)v/=max;
-    
-    //scale to the roboclaw units: transform % to encoders speeds
-    for(auto &v:vm)v*=RC_MAX_MOTOR_SPEED;
+    if(max>MAX_MOTOR_SPEED) for(auto &v:vm)v/=max;
+
+    //scale to the roboclaw units: transform rads/sec to encoders speeds
+    for(auto &v:vm)v*=RADS_2_CPR;
+
     //store as integers in counts per sec
-    for(int i=0;i<4;i++)target_velocity[0].t_int=vm[i];
+    for(int i=0;i<4;i++)target_velocity[0].t_int=static_cast<int32_t>(vm[i]);
 
 }
+//Sets the robot speed proportional to the maximun speed (-1.0, 1.0)
+void RobotDrive::set_velocity(float vx, float vy, float vr)
+{
+    if(!move_commands_enabled)return; //nothing is executed
+    
+    //compute the motors speeds as function of vx, vy, vr
+    float vm[4]; IK(vx, vy, vr, vm);
+
+    //scale to the roboclaw units: transform rads/sec to encoders speeds
+    for(auto &v:vm)v*=RADS_2_CPR;
+
+    //store as integers in counts per sec
+    for(int i=0;i<4;i++)target_velocity[0].t_int=static_cast<int32_t>(vm[i]);
+
+}
+
 //if needed it is possible to deal  with overflows and unerflows (use ReqdM1Encoder instead)
 //overflow, underflow will happen after 84Km so probably it is not neccesary
 //it also computes in m the displacement of each wheel
 void RobotDrive::read_encoders(){
-  int32_u enc[4];
-  float rev[4]{}; //revolutions
-  if(rc_left.ReadEncoders(RC_ID, enc[0].t_uint,enc[1].t_uint) && 
-     rc_right.ReadEncoders(RC_ID, enc[2].t_uint,enc[3].t_uint)){
+  int32_u encs[4];
+  float angs[4]{}; //radians
+  if(rc_left.ReadEncoders(RC_ID, encs[0].t_uint,encs[1].t_uint) && 
+     rc_right.ReadEncoders(RC_ID, encs[2].t_uint,encs[3].t_uint)){
      //odometry is computed, and enc counts updated only if all readings are ok 
      for(int i=0;i<4;i++){
-        rev[i]=(enc[i].t_int-encoder_counts[i].t_int);
-    
-        encoder_counts[i]=enc[i];
+        angs[i]=(encs[i].t_int-encoder_counts[i].t_int);
+        encoder_counts[i]=encs[i];
      }
      //from encoder counts to rads 
-     for(auto &r:rev)r*=CPR_2_RADS;
+     for(auto &r:angs)r*=CPR_2_RADS;
+     //compute displacements 
+     float d_xr, d_yr, d_yaw; FK(angs,d_xr, d_yr, d_yaw);
      
-     float d_xr=MEC_RAD*(-rev[0]+rev[1]-rev[2]+rev[3])/4;
-
-     float d_yr=MEC_RAD*(rev[0]+rev[1]+rev[2]+rev[3])/4;
-     float d_yaw=MEC_RAD*(-rev[0]+rev[1]+rev[2]-rev[3])/(4*(ROSA_LENGTH+ROSA_WIDTH));
      //odometry update x_pos, y_pos, yaw
      x_pos+= d_xr * cos( yaw + d_yaw/2 )-d_yr * sin( yaw + d_yaw/2);
      y_pos+= d_xr * sin( yaw + d_yaw/2 )+d_yr * cos( yaw + d_yaw/2);
      yaw += d_yaw;
 
   }
-
 }
 //reset odometry (0, 0, 0), and the roboclaw counts
 void RobotDrive::reset_odometry(){

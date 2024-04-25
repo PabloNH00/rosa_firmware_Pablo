@@ -77,7 +77,7 @@ void handle_gamepad()
     if(gamepad.is_controlling()){ 
         if(gamepad.emergency_stop())robot.emergency_stop();
         else{
-            robot.set_velocity( 
+            robot.set_relative_velocity( 
                 -gamepad.get_ry(), //forward
                 -gamepad.get_rx(), //sideward
                 gamepad.get_ly()  //rotation
