@@ -32,7 +32,6 @@ void RobotDrive::emergency_stop(){
 //the loss of gdl have to be considered inb order to correctly test the IK
 inline void RobotDrive::FK(const float vm[4], float &vx, float &vy, float &vr)
 { 
-  //VERIFICAR DE NUEVO
    vx=MEC_RAD*(vm[0]+vm[1]+vm[2]+vm[3])/4;
     vr=MEC_RAD*(-vm[0]+vm[1]+vm[2]-vm[3])/4;
     vy=MEC_RAD*(vm[0]-vm[1]+vm[2]-vm[3])/(4*LXY);
