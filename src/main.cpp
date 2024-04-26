@@ -16,7 +16,7 @@ inline void send_message(const ROSAmens &m){
 }
 void setup()
  {
-
+  
   Serial.begin(COMMANDS_BAUD_RATE);
   robot.setup();
   gamepad.setup();
