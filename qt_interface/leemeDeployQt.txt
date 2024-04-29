@@ -1,0 +1,20 @@
+
+En la instalación de QT, para el sistema de compilación específica se saca(por comodidad):
+
+windeployqt.exe
+qtenv2.bat
+
+y se pegan en un directorio temporal, en el que además se pega el ejecutable generado con ese compilador
+despues en un terminar se ejecuta  windeployqt.exe <aplicacionqt>.exe
+_________________EJEMPLO__________________
+Este ejecutable se ha sacado de la carpeta: 
+C:\Qt\5.14.2\msvc2017\bin
+
+En el se encuewntra el bat  y el windeployqt necesarios para generar todo lo que hay que llevarse para hacer un aplicación standalone
+
+En un terminal:
+ejecutar el bat
+y ejecutar windeployqt.exe RomerinQtApp.exe
+
+copiará todos los archivos necesarios para ejecutar la aplicación en windows.
+

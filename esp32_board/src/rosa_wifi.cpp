@@ -56,46 +56,44 @@ void RosaWiFi::loop()
            if(millis()-_time_watch_dog>TIME_OUT_WIFI_MASTER)ip_remote[0]=0;
            while(buffer.there_is_msg()){
                 ROSAmens &&m=buffer.getMessage();
-                //ROSAmens &&resp=executeWifiMessage(m);
-                //RosaWiFi::sendMessage(resp,m.ip);
+                ROSAmens &&resp=executeWifiMessage(m);
+                RosaWiFi::sendMessage(resp);
            }
         break;
     }
 }
 
-/*RmMsg RosaWiFi::executeWifiMessage(const RMWifiMsg &m)
+ROSAmens RosaWiFi::executeWifiMessage(const ROSAmens &m)
 {
   switch(m.id){
-    case RM_SET_MASTER_IP:
+    case ROSA_SET_MASTER_IP:
       _time_watch_dog=millis();
-      //si aun no hay master... adopto el master y respondo con mis datos.
-      if(!RMWiFi::ip_remote[0])RMWiFi::ip_remote=m.ip;
-        else if(RMWiFi::ip_remote[3]!=(m.ip)[3])break;
-      return name_message(RMDefs::MODULE_NAME);
-      
+      return name_message(RosaDefs::ROBOT_NAME);    
   }
-return executeMessage(m); //remaining messages are executed as always
-}*/
+  return ROSAmens::none();
+//return proccess_message(m); //remaining messages are executed as always
+}
 
 void RosaWiFi::sendMessage(const ROSAmens &m, const IPAddress &ip)
 {
   if(!ip[0])return;
   if(m.size){
     AsyncUDPMessage mens;
-    mens.write(m.data,m.size+3);
-    udp.sendTo(mens,ip,12001);  
+    mens.write(m.data,m.datagram_size());
+    udp.sendTo(mens,ip,ROSA_OUTPUT_UDP_PORT);  
   }
 }
 
 void RosaWiFi::listenUDP()
 {
 
-  if (udp.listen(12000)) {
+  if (udp.listen(ROSA_INPUT_UDP_PORT)) {
     udp.onPacket([](AsyncUDPPacket packet) {
         for(int i=0;i<packet.length();i++){
             if(msg_reader.add_uchar(packet.data()[i])){
-                //packet.remoteIP()
-                buffer.push_single(msg_reader.getMessage());
+                auto&& mens=msg_reader.getMessage();
+                if(!RosaWiFi::ip_remote[0])RosaWiFi::ip_remote=packet.remoteIP();
+                if(RosaWiFi::ip_remote==packet.remoteIP())buffer.push_single(mens);
             }
         }
     });
