@@ -12,7 +12,11 @@ ROSAgamepad gamepad;
 
 void handle_serial_port();
 void handle_gamepad();
+//MAIN command execution function prototipe
+ROSAmens proccess_message( ROSAmens &m);
+
 inline void send_message(const ROSAmens &m){
+    if(!m.size)return;
     Serial.write(m.data,m.datagram_size());
 }
 void setup()
@@ -55,22 +59,9 @@ void handle_serial_port(){
 static ROSAmens::MsgReader reader; //the reader must be persistent
 while (Serial.available()) {
     if (reader.add_uchar(Serial.read())) {
-        auto m = reader.getMessage();
-        switch (m.id) {
-            case ROSA_CMD_VEL: {
-                //message of CMD_VEL interpretation, get values
-                auto vx=m.read<float>(), vy=m.read<float>(), vr=m.read<float>();
-                //do something with that values...
-                robot.set_velocity(vx,vy,vr);
-            }break;
-        case ROSA_RESET_ODOMETRY:
-            //message that resets the robot odometry
-            robot.reset_odometry();
-        break;
-        default:
-            //unknown message
-            ;
-        }
+        auto &&m = reader.getMessage();
+        send_message(proccess_message(m));
+
     }
 }//while
 }
@@ -102,3 +93,22 @@ void handle_gamepad()
     }
 }
 
+ROSAmens proccess_message( ROSAmens &m)
+{
+    switch (m.id) {
+        case ROSA_CMD_VEL: {
+            //message of CMD_VEL interpretation, get values
+            auto vx=m.read<float>(), vy=m.read<float>(), vr=m.read<float>();
+            //do something with that values...
+            robot.set_velocity(vx,vy,vr);
+        }break;
+        case ROSA_RESET_ODOMETRY:
+            //message that resets the robot odometry
+            robot.reset_odometry();
+        break;
+        default:
+            //unknown message
+            ;
+        }
+    return ROSAmens::none();
+}

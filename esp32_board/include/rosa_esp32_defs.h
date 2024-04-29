@@ -9,8 +9,11 @@
 #define ROSA_HEARTBEAT 500       //ms
 #define TIME_OUT_WIFI_MASTER 5000  //after 5 seconds without wifi messages, no output messages will be sent
 
+
 #define ROSA_CONF_FILE_VERSION 1
 #define SET_DEFAULT_CONFIGURATION_DATA 0
+
+
 
 class RosaDefs{
     public:

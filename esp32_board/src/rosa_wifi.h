@@ -30,7 +30,7 @@ public:
     static void loop();
     static void listenUDP();
     static bool isConnected(){return state==WIFI_STATE::CONNECTED;}
-    
+    static ROSAmens executeWifiMessage(const ROSAmens &m);
     static void sendMessage(const ROSAmens &m, const IPAddress &ip=ip_remote);
     static bool isConected2Master(){return((isConnected())&&(RosaWiFi::ip_remote[0]));}
     static void sendText(const char *text);
