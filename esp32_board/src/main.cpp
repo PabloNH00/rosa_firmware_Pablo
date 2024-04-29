@@ -1,9 +1,10 @@
 #include <Arduino.h>
 #include <robot_drive.h>
-#include "rosa_defs.h"
+#include "rosa_esp32_defs.h"
 #include "rosa_gamepad.h"
-#include "utils.h"
-
+#include "rosa_esp32_utils.h"
+#include "rosa_messages.h"
+#include "rosa_wifi.h"
 
  //ROSA COMPONENTS
 RobotDrive robot;
@@ -16,10 +17,13 @@ inline void send_message(const ROSAmens &m){
 }
 void setup()
  {
-  
+  RosaDefs::readConfiguration();  //gets config data from a configurable internal file
   Serial.begin(COMMANDS_BAUD_RATE);
   robot.setup();
   gamepad.setup();
+   
+   RosaWiFi::setup(); //wifi initialization
+   delay(1000);
  }
  
  void loop()
@@ -27,6 +31,9 @@ void setup()
     static TIMER heart_beat(ROSA_HEARTBEAT), update_ros(ROS_UPDATE_INFO_RATE);
     handle_serial_port();
     handle_gamepad();
+    RosaWiFi::loop();
+    //if(RosaWiFi::isConected2Master())sendRegularMessages();
+
     robot.loop();
 
     if(heart_beat())//do something to show that the uc is alive

@@ -2,14 +2,6 @@
 #include "spslib.h"
 
 typedef SPS::Message<> ROSAmens;
-//DEBUG OPTIONS
-//#define DEBUG_GAME_PAD 
-
-//ROSA DEFINITIONS
-#define COMMANDS_BAUD_RATE 38400 //bauds
-#define ROS_UPDATE_INFO_RATE 100 //ms
-#define ROSA_HEARTBEAT 500       //ms
-
 
 //ROSA ROS driver messages IDs
 //ROSA->ROS2
