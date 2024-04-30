@@ -25,5 +25,6 @@ private:
     QUdpSocket * ip_port;
     QTimer timer;
     void read_ip_port();
+    void setText(char *text);
 };
 #endif // MAINWINDOW_H

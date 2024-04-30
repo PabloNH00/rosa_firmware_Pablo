@@ -2,7 +2,8 @@
 #include "ui_mainwindow.h"
 #include <QNetworkInterface>
 #include <QNetworkDatagram>
-
+#include <QTextDocument>
+#include <QTextBlock>
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow), ip_port(0)
@@ -33,8 +34,15 @@ void MainWindow::loop()
 
     static int count=0;
     if(count++>20)count=0;
+    if((ip_port)&&(!ui->B_check->isChecked())){
+        ip_port->close();
+        delete ip_port;
+        ip_port=nullptr;
+        ui->CB_NetworkInterfaces->setEnabled(true);
 
-    if(!ip_port){
+    }
+    if((!ip_port)&&(ui->B_check->isChecked())){
+        ui->CB_NetworkInterfaces->setEnabled(false);
         ip_port=new QUdpSocket(this);
         QHostAddress local(ui->CB_NetworkInterfaces->currentText());
         ip_port->bind(local, ROSA_OUTPUT_UDP_PORT);
@@ -42,7 +50,7 @@ void MainWindow::loop()
                     this, &MainWindow::read_ip_port);
     }
     //regular BROADCAST message
-    if(count==0){
+    if((ip_port)&&(count==0)){
         ROSAmens ping(ROSA_SET_MASTER_IP);
         ip_port->writeDatagram((const char *)(ping.data),ping.datagram_size(),QHostAddress::Broadcast,ROSA_INPUT_UDP_PORT);
     }
@@ -79,4 +87,8 @@ void MainWindow::read_ip_port()
             }
       }
   }
+}
+void MainWindow::setText(char *text){
+    ui->TE_info->append(QString((char *)text));
+    ui->TE_info->moveCursor(QTextCursor::End);
 }

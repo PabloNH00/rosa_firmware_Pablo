@@ -68,6 +68,7 @@ ROSAmens RosaWiFi::executeWifiMessage(const ROSAmens &m)
   switch(m.id){
     case ROSA_SET_MASTER_IP:
       _time_watch_dog=millis();
+       Serial.printf("MASTER CONECTED");
       return name_message(RosaDefs::ROBOT_NAME);    
   }
   return ROSAmens::none();

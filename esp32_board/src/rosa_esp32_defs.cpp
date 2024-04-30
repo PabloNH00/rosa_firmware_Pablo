@@ -13,8 +13,8 @@ uint8_t RosaDefs::SUBNET_MASK[4]={255, 255, 255, 0};
 #ifdef ETSIDI
 uint8_t RosaDefs::IP_ADDRESS[4]={192, 168, 253, 9};
 uint8_t RosaDefs::GATEWAY_ADDRESS[4]={192, 168, 253, 61};
- char RosaDefs::WIFI_SSID[50]="RM2_WIFI";
- char RMRosaDefsDefs::WIFI_KEY[50]="R0BOMINERS*";
+ char RosaDefs::WIFI_SSID[50]="Labproyectos";
+ char RMRosaDefsDefs::WIFI_KEY[50]="Kraton8s";
 #else
   uint8_t RosaDefs::IP_ADDRESS[4]={192, 168, 1, 109};       
   uint8_t RosaDefs::GATEWAY_ADDRESS[4]={192, 168, 1, 1}; 
