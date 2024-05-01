@@ -19,6 +19,11 @@ inline void send_message(const ROSAmens &m){
     if(!m.size)return;
     Serial.write(m.data,m.datagram_size());
 }
+void send_wifi_regular_messages()
+{
+if(!RosaWiFi::isConected2Master())return;
+RosaWiFi::sendMessage(robot_data_message(robot.get_robot_data()));
+}
 void setup()
  {
   RosaDefs::readConfiguration();  //gets config data from a configurable internal file
@@ -32,12 +37,10 @@ void setup()
  
  void loop()
  {
-    static TIMER heart_beat(ROSA_HEARTBEAT), update_ros(ROS_UPDATE_INFO_RATE);
+    static TIMER heart_beat(ROSA_HEARTBEAT), update_ros(ROS_UPDATE_INFO_RATE), update_wifi(WIFI_UPDATE_INFO_RATE);
     handle_serial_port();
     handle_gamepad();
     RosaWiFi::loop();
-    //if(RosaWiFi::isConected2Master())sendRegularMessages();
-
     robot.loop();
 
     if(heart_beat())//do something to show that the uc is alive
@@ -49,9 +52,11 @@ void setup()
         //deberia incluir un timeout que detecte si hay comunicacion
         auto [x, y,yaw] = robot.get_odometry();
         Serial.printf("x:%5.2F y:%5.2f yaw:%5.2F \n",x,y,yaw);
+        DEBUG_PRINTF("x:%5.2F y:%5.2f yaw:%5.2F",x,y,yaw);
         //send_message(odometry_message(x,y,yaw));
         
     }
+    if(update_wifi())send_wifi_regular_messages();
     
  }
 

@@ -31,9 +31,9 @@ bool RosaDefs::readConfiguration(){
      return false;
   }
   #if SET_DEFAULT_CONFIGURATION_DATA == 1
-    BT_DEBUG("Removing the previous configuration file");
+    WIFI_DEBUG("Removing the previous configuration file");
     if (!SPIFFS.remove("/configuration.txt"))
-      BT_DEBUG("Configuration file does not exist");
+      WIFI_DEBUG("Configuration file does not exist");
   #endif
 
   //if no file exists, create the file with default values

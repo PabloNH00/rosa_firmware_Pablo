@@ -19,6 +19,7 @@ typedef SPS::Message<> ROSAmens;
 #define ROSA_SET_MASTER_IP 0xE1
 //ROSA->QT
 #define ROSA_NAME 0xF1
+#define ROSA_ROBOT_DATA 0xF2
 
 /////////////utility inline functions///////////////////////////////////////////
 inline ROSAmens text_message(SPS::uchar_t cmd, const char *text)
@@ -37,4 +38,19 @@ inline ROSAmens odometry_message(float x, float y, float yaw)
     m.write<float>(y);
     m.write<float>(yaw);
     return m;
+}
+struct RobotData{
+   int32_t current_velocity[4]{};
+   int32_t target_velocity[4]{};
+   int32_t encoder_counts[4]{};
+   float battery_voltage=0;  
+};
+inline ROSAmens robot_data_message(const RobotData& data){
+    ROSAmens m(ROSA_ROBOT_DATA);
+    m.write_array<int32_t>(data.current_velocity,4);
+    m.write_array<int32_t>(data.target_velocity,4);
+    m.write_array<int32_t>(data.encoder_counts,4);
+    m.write<float>(data.battery_voltage);
+    return m;
+
 }

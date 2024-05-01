@@ -1,7 +1,7 @@
 #pragma once
 #include <Arduino.h>
 #include "RoboClaw.h"
-
+#include "rosa_messages.h"
 #define RC_BAUD_RATE 38400
 #define RC_TIMEOUT 1000 //1s of coms timeout
 //motors should work at 3K rpm as max
@@ -42,6 +42,7 @@ struct Odometry{
   float y_pos=0;
   float yaw=0;
 };
+
 class RobotDrive{
     RoboClaw rc_left =  RoboClaw(&RC_LEFT_PORT, RC_TIMEOUT);
     RoboClaw rc_right = RoboClaw(&RC_RIGHT_PORT,RC_TIMEOUT);
@@ -65,6 +66,7 @@ class RobotDrive{
     void emergency_stop();
    void reset_odometry();
    Odometry get_odometry(){return Odometry{x_pos, y_pos, yaw};}
+   RobotData get_robot_data();
    static void FK(const float v[4], float &vx, float &vy, float &vr);
    static void IK(const float &vx, const float &vy, const float &vr, float vm[4]);
 };

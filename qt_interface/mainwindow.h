@@ -21,10 +21,14 @@ private slots:
     void loop();
 private:
     Ui::MainWindow *ui;
+
     ROSAmens::MsgReader udp_reader;
     QUdpSocket * ip_port;
     QTimer timer;
     void read_ip_port();
     void setText(char *text);
+    void process_message(ROSAmens &m);
+    void info(const QString &mens);
+    void update_robot_data(const RobotData &data);
 };
 #endif // MAINWINDOW_H

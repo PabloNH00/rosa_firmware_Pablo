@@ -22,6 +22,8 @@ void RobotDrive::loop(){
       */
   }
 
+
+
 }
 void RobotDrive::emergency_stop(){
     for (auto &v:target_velocity)v.t_int=0;
@@ -115,6 +117,22 @@ void RobotDrive::reset_odometry(){
   x_pos=y_pos=yaw=0.0F;
 }
 
+RobotData RobotDrive::get_robot_data(){
+
+    //solo para ver como va
+  static int contador=0;
+  for (auto &v:target_velocity)v.t_int=contador++;
+  for (auto &v:current_velocity)v.t_int=contador++;
+  for (auto &v:encoder_counts)v.t_int=contador++;
+  battery_voltage=12.0 + sin(contador/10);
+  
+  return RobotData{
+  {current_velocity[0].t_int, current_velocity[1].t_int,current_velocity[2].t_int,current_velocity[3].t_int},
+  {target_velocity[0].t_int,target_velocity[1].t_int,target_velocity[2].t_int,target_velocity[3].t_int},
+  {encoder_counts[0].t_int,encoder_counts[1].t_int,encoder_counts[2].t_int,encoder_counts[3].t_int},
+  battery_voltage
+  };
+}
 /*
 notas del robogait:
    

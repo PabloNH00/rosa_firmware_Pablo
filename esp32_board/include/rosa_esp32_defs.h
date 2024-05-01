@@ -5,7 +5,8 @@
 
 //ROSA DEFINITIONS
 #define COMMANDS_BAUD_RATE 38400 //bauds
-#define ROS_UPDATE_INFO_RATE 100 //ms
+#define ROS_UPDATE_INFO_RATE 50 //ms
+#define WIFI_UPDATE_INFO_RATE 255 //ms
 #define ROSA_HEARTBEAT 500       //ms
 #define TIME_OUT_WIFI_MASTER 5000  //after 5 seconds without wifi messages, no output messages will be sent
 

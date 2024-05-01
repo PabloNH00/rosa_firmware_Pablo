@@ -29,6 +29,9 @@
 #define PACKED
 #endif
 
+#include <iostream>
+using std::cout, std::endl;
+
 //endianess verification
 // include something to verify that is LITTLE-ENDIAN
 
@@ -86,9 +89,9 @@ namespace SPS
         
         template <typename T>
         auto read() { //if not possible returns the zero value
-            if (size - (_info_reader - info) < sizeof(T))return T{};
+            if (size - index_reader < sizeof(T))return T{};
             union2byte<T> aux;
-            for (auto& a : aux.bytes)a = *(_info_reader++);
+            for (auto& a : aux.bytes)a = info[index_reader++];
             return aux.var;
         }
         
@@ -115,10 +118,11 @@ namespace SPS
         }
         char * read_cstring(char* s, uchar_t max) {
             uint8_t index = 0;
-            while ((index +1 < max) && (*_info_reader != 0) && (_info_reader-info<_MAX_SIZE))  
-                 s[index++]= *(_info_reader++);
+
+            while ((index +1 < max) && (info[index_reader] != 0) && (index_reader<_MAX_SIZE))
+                 s[index++]= info[index_reader++];
             s[index++] = 0;
-            if (*_info_reader == 0)_info_reader++;
+            if (info[index_reader] == 0)index_reader++;
             return s;
         }
        
@@ -168,10 +172,10 @@ namespace SPS
 
         };
     private:
-        uchar_t *_info_reader = info;
+        uchar_t index_reader = 0;
         static constexpr uint16_t FULLHEADER_SIZE = 5;
         static_assert(_MAX_SIZE < 255, "Message info can't exceed 254 bytes");
-    };
+    }PACKED;
     #pragma pack()
 
     template <int M, uint16_t H>
