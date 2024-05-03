@@ -1,9 +1,9 @@
 QT       += core gui network
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
-
+lessThan(QT_MAJOR_VERSION, 6):QMAKE_CXXFLAGS += "/bigobj"
 CONFIG += c++17
-QMAKE_CXXFLAGS += "/bigobj"
+
 
 # The following define makes your compiler emit warnings if you use
 # any Qt feature that has been marked deprecated (the exact warnings

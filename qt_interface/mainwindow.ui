@@ -13,6 +13,7 @@
   <property name="font">
    <font>
     <family>Century Gothic</family>
+    <pointsize>9</pointsize>
    </font>
   </property>
   <property name="windowTitle">
@@ -81,7 +82,6 @@
      <font>
       <family>Arial</family>
       <pointsize>9</pointsize>
-      <weight>50</weight>
       <bold>false</bold>
      </font>
     </property>
@@ -282,7 +282,7 @@
      <rect>
       <x>30</x>
       <y>130</y>
-      <width>81</width>
+      <width>91</width>
       <height>16</height>
      </rect>
     </property>
@@ -375,7 +375,7 @@
      <x>0</x>
      <y>0</y>
      <width>777</width>
-     <height>23</height>
+     <height>19</height>
     </rect>
    </property>
   </widget>

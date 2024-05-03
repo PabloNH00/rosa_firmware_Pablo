@@ -89,7 +89,7 @@ namespace SPS
         
         template <typename T>
         auto read() { //if not possible returns the zero value
-            if (size - index_reader < sizeof(T))return T{};
+            if (size < sizeof(T)+index_reader)return T{};
             union2byte<T> aux;
             for (auto& a : aux.bytes)a = info[index_reader++];
             return aux.var;
@@ -223,7 +223,7 @@ namespace SPS
         crc_tab16_init = true;
         crc = 0x0000; //CRC_START_16
         ptr = input_str;
-        if (ptr != NULL) for (a = 0; a < num_bytes; a++) {
+        if (ptr != nullptr) for (a = 0; a < (size_t)num_bytes; a++) {
             short_c = 0x00ff & (uint16_t)*ptr;
             tmp = crc ^ short_c;
             crc = (crc >> 8) ^ crc_tab16[tmp & 0xff];

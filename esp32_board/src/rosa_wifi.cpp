@@ -1,4 +1,5 @@
 #include "rosa_wifi.h"
+#include "rosa_esp32_utils.h"
 #include <stdarg.h>
 ROSAmens::CircularBuffer<> RosaWiFi::buffer{};
 ROSAmens::MsgReader RosaWiFi::msg_reader{};
@@ -68,7 +69,7 @@ ROSAmens RosaWiFi::executeWifiMessage(const ROSAmens &m)
   switch(m.id){
     case ROSA_SET_MASTER_IP:
       _time_watch_dog=millis();
-       Serial.printf("MASTER CONECTED");
+       WIFI_DEBUG("MASTER CONECTED");
       return name_message(RosaDefs::ROBOT_NAME);    
   }
   return ROSAmens::none();
