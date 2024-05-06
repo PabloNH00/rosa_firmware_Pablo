@@ -51,9 +51,9 @@ void setup()
     {
         //deberia incluir un timeout que detecte si hay comunicacion
         auto [x, y,yaw] = robot.get_odometry();
-        Serial.printf("x:%5.2F y:%5.2f yaw:%5.2F \n",x,y,yaw);
-        DEBUG_PRINTF("x:%5.2F y:%5.2f yaw:%5.2F",x,y,yaw);
-        //send_message(odometry_message(x,y,yaw));
+        //Serial.printf("x:%5.2F y:%5.2f yaw:%5.2F \n",x,y,yaw);
+        //DEBUG_PRINTF("x:%5.2F y:%5.2f yaw:%5.2F",x,y,yaw);
+        send_message(odometry_message(x,y,yaw));
         
     }
     if(update_wifi())send_wifi_regular_messages();
@@ -100,6 +100,7 @@ void handle_gamepad()
 
 ROSAmens proccess_message( ROSAmens &m)
 {
+    WIFI_DEBUG("SERIAL COMMAND RECEIVED");
     switch (m.id) {
         case ROSA_CMD_VEL: {
             //message of CMD_VEL interpretation, get values
@@ -111,6 +112,25 @@ ROSAmens proccess_message( ROSAmens &m)
             //message that resets the robot odometry
             robot.reset_odometry();
         break;
+        case ROSA_GET_WIFI_CONFIG:{
+            WIFI_DEBUG("ROSA_GET_WIFI_CONFIG");
+            ROSAmens resp(ROSA_WIFI_INFO);
+            resp.write_array<uint8_t>(RosaDefs::IP_ADDRESS,4);
+            resp.write_array<uint8_t>(RosaDefs::GATEWAY_ADDRESS,4);
+            resp.write_array<uint8_t>(RosaDefs::SUBNET_MASK,4);
+            resp.write_cstring(RosaDefs::WIFI_SSID);
+            resp.write_cstring(RosaDefs::WIFI_KEY);
+            return resp;
+        }
+        case ROSA_SET_WIFI_INFO:{
+            m.read_array<uint8_t>(RosaDefs::IP_ADDRESS,4);
+            m.read_array<uint8_t>(RosaDefs::GATEWAY_ADDRESS,4);
+            m.read_array<uint8_t>(RosaDefs::SUBNET_MASK,4);
+            m.read_cstring(RosaDefs::WIFI_SSID,50);
+            m.read_cstring(RosaDefs::WIFI_KEY,50);
+            uint8_t res=RosaDefs::writeConfiguration();
+            return ROSAmens(ROSA_WIFI_CONFIGURED,res);
+        }
         default:
             //unknown message
             ;

@@ -67,7 +67,7 @@ namespace SPS
         //commonly used constructors
         Message() :header{ _HEADER }, size{ 0 }{}
         Message(uchar_t cmd): header{ _HEADER }, size{ 1 }, id {cmd}{ write_crc(); }
-        Message(uchar_t cmd, uchar_t value) : header{ _HEADER }, size{ 1 }, id{ cmd }{ info[0] = value; write_crc();}  
+        Message(uchar_t cmd, uchar_t value) : header{ _HEADER }, size{ 2 }, id{ cmd }{ info[0] = value; write_crc();}
         uchar_t& operator[](int ind) { return data[ind]; }
         static auto& none() { static Message _none; return _none; }
         void write_crc() { crc = crc16(data + FULLHEADER_SIZE, size); }

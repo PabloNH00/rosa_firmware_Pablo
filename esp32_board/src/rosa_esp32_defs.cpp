@@ -5,7 +5,7 @@
 #include "SPIFFS.h"
 
 
-//#define ETSIDI
+#define ETSIDI
 
 char RosaDefs::ROBOT_NAME[100]="ROSA";
 uint8_t RosaDefs::SUBNET_MASK[4]={255, 255, 255, 0};
@@ -14,12 +14,12 @@ uint8_t RosaDefs::SUBNET_MASK[4]={255, 255, 255, 0};
 uint8_t RosaDefs::IP_ADDRESS[4]={192, 168, 253, 9};
 uint8_t RosaDefs::GATEWAY_ADDRESS[4]={192, 168, 253, 61};
  char RosaDefs::WIFI_SSID[50]="Labproyectos";
- char RMRosaDefsDefs::WIFI_KEY[50]="Kraton8s";
+ char RosaDefs::WIFI_KEY[50]="Kraton8s";
 #else
   uint8_t RosaDefs::IP_ADDRESS[4]={192, 168, 1, 109};       
   uint8_t RosaDefs::GATEWAY_ADDRESS[4]={192, 168, 1, 1}; 
   char RosaDefs::WIFI_SSID[50]="MHG";   
-  char RosaDefs::WIFI_KEY[50]="fll100218"; 
+  char RosaDefs::WIFI_KEY[50]="******"; 
 #endif
 
 //Reads the configuration file if exists. Creates the configuration file 

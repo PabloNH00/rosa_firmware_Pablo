@@ -17,9 +17,13 @@ typedef SPS::Message<> ROSAmens;
 
 //QT->ROSA
 #define ROSA_SET_MASTER_IP 0xE1
+#define ROSA_GET_WIFI_CONFIG 0xE2
+#define ROSA_SET_WIFI_INFO 0xE3
 //ROSA->QT
 #define ROSA_NAME 0xF1
 #define ROSA_ROBOT_DATA 0xF2
+#define ROSA_WIFI_INFO 0xF3
+#define ROSA_WIFI_CONFIGURED 0xF4
 
 /////////////utility inline functions///////////////////////////////////////////
 inline ROSAmens text_message(SPS::uchar_t cmd, const char *text)
@@ -53,4 +57,20 @@ inline ROSAmens robot_data_message(const RobotData& data){
     m.write<float>(data.battery_voltage);
     return m;
 
+}
+struct WiFiData{
+    uint8_t ip[4]{};
+    uint8_t gateway[4]{};
+    uint8_t mask[4]{};
+    char ssid[50]{};
+    char key[50]{};
+};
+inline ROSAmens info_wifi_message(SPS::uchar_t cmd, const WiFiData &data){
+    ROSAmens m(cmd);
+    m.write_array<uint8_t>(data.ip,4);
+    m.write_array<uint8_t>(data.gateway,4);
+    m.write_array<uint8_t>(data.mask,4);
+    m.write_cstring(data.ssid);
+    m.write_cstring(data.key);
+    return m;
 }
