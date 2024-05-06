@@ -1,4 +1,4 @@
-QT       += core gui network
+QT       += core gui serialport network
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 lessThan(QT_MAJOR_VERSION, 6):QMAKE_CXXFLAGS += "/bigobj"
@@ -19,16 +19,19 @@ DEFINES += QT_DEPRECATED_WARNINGS
 SOURCES += \
     heartbeat.cpp \
     main.cpp \
-    mainwindow.cpp
+    mainwindow.cpp \
+    serialconfigdialog.cpp
 
 HEADERS += \
     heartbeat.h \
     mainwindow.h \
     ../shared_src/rosa_messages.h \
-    ../shared_src/spslib.h
+    ../shared_src/spslib.h \
+    serialconfigdialog.h
 
 FORMS += \
-    mainwindow.ui
+    mainwindow.ui \
+    serialconfigdialog.ui
 
 
 win32 {

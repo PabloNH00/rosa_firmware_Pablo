@@ -97,6 +97,7 @@
      <font>
       <family>Arial</family>
       <pointsize>9</pointsize>
+      <weight>50</weight>
       <bold>false</bold>
      </font>
     </property>
@@ -386,6 +387,19 @@
      <string notr="true">background-color: rgb(224, 27, 36);</string>
     </property>
    </widget>
+   <widget class="QPushButton" name="pushButton">
+    <property name="geometry">
+     <rect>
+      <x>430</x>
+      <y>10</y>
+      <width>111</width>
+      <height>23</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>WiFi ESP32 config</string>
+    </property>
+   </widget>
   </widget>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">
@@ -393,7 +407,7 @@
      <x>0</x>
      <y>0</y>
      <width>549</width>
-     <height>19</height>
+     <height>21</height>
     </rect>
    </property>
   </widget>

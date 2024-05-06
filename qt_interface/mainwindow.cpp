@@ -1,5 +1,6 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
+#include "serialconfigdialog.h"
 #include <QNetworkInterface>
 #include <QNetworkDatagram>
 #include <QTextDocument>
@@ -123,4 +124,10 @@ void MainWindow::info(const QString &mens)
 {
     ui->statusbar->showMessage(mens,5000);
     update();
+}
+
+void MainWindow::on_pushButton_clicked()
+{
+    SerialConfigDialog midlg(this);
+    midlg.exec();
 }

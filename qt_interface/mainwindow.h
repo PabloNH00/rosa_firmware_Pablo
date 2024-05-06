@@ -19,6 +19,8 @@ public:
 private slots:
 
     void loop();
+    void on_pushButton_clicked();
+
 private:
     Ui::MainWindow *ui;
 
