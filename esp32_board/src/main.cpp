@@ -131,6 +131,10 @@ ROSAmens proccess_message( ROSAmens &m)
             uint8_t res=RosaDefs::writeConfiguration();
             return ROSAmens(ROSA_WIFI_CONFIGURED,res);
         }
+        case ROSA_ENABLE_ROBOCLAWS:{
+            auto val=m.read<uint8_t>();
+            robot.enable(val);
+        }
         default:
             //unknown message
             ;

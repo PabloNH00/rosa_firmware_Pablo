@@ -27,6 +27,8 @@ private slots:
 
      void on_B_Save_clicked();
 
+     void on_checkBox_toggled(bool checked);
+
 private:
     Ui::SerialConfigDialog *ui;
     QTimer timer;

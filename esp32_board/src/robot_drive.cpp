@@ -6,24 +6,14 @@ void RobotDrive::setup(){
 }
 void RobotDrive::loop(){
   static TIMER read_timer(50), command_timer(50); //20 times per sec
-  if(command_timer()){
-    rc_left.SpeedM1M2(RC_ID,
-      target_velocity[m1_left].t_uint, target_velocity[m2_left].t_uint );
-    rc_right.SpeedM1M2(RC_ID,
-      target_velocity[m1_right].t_uint, target_velocity[m2_right].t_uint );
-  } else
-  if(read_timer()){
-    read_encoders();
+  if(command_timer())command_speed();
+  else if(read_timer())read_encoders();
     /*
     rc_left.ReadISpeeds(RC_ID, 
       current_velocity[m1_left].t_uint, current_velocity[m2_left].t_uint );
     rc_right.ReadISpeeds(RC_ID, 
       current_velocity[m1_right].t_uint, current_velocity[m2_right].t_uint );
       */
-  }
-
-
-
 }
 void RobotDrive::emergency_stop(){
     for (auto &v:target_velocity)v.t_int=0;
@@ -82,13 +72,22 @@ void RobotDrive::set_velocity(float vx, float vy, float vr)
     for(int i=0;i<4;i++)target_velocity[0].t_int=static_cast<int32_t>(vm[i]);
 
 }
-
+void RobotDrive::command_speed(){
+  if(mock_hardware)return;
+    rc_left.SpeedM1M2(RC_ID,
+      target_velocity[m1_left].t_uint, target_velocity[m2_left].t_uint );
+    rc_right.SpeedM1M2(RC_ID,
+      target_velocity[m1_right].t_uint, target_velocity[m2_right].t_uint );
+}
 //if needed it is possible to deal  with overflows and unerflows (use ReqdM1Encoder instead)
 //overflow, underflow will happen after 84Km so probably it is not neccesary
 //it also computes in m the displacement of each wheel
 void RobotDrive::read_encoders(){
   int32_u encs[4];
   float angs[4]{}; //radians
+
+  if(mock_hardware)return; //this should be modified to emulate the encoders
+
   if(rc_left.ReadEncoders(RC_ID, encs[0].t_uint,encs[1].t_uint) && 
      rc_right.ReadEncoders(RC_ID, encs[2].t_uint,encs[3].t_uint)){
      //odometry is computed, and enc counts updated only if all readings are ok 
@@ -111,10 +110,12 @@ void RobotDrive::read_encoders(){
 }
 //reset odometry (0, 0, 0), and the roboclaw counts
 void RobotDrive::reset_odometry(){
-  rc_left.ResetEncoders(RC_ID);
-  rc_right.ResetEncoders(RC_ID);
+
   for(auto &enc:encoder_counts)enc.t_int=0;
   x_pos=y_pos=yaw=0.0F;
+  if(mock_hardware)return;
+  rc_left.ResetEncoders(RC_ID);
+  rc_right.ResetEncoders(RC_ID);
 }
 
 RobotData RobotDrive::get_robot_data(){

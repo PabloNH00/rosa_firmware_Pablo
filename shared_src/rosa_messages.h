@@ -19,6 +19,7 @@ typedef SPS::Message<> ROSAmens;
 #define ROSA_SET_MASTER_IP 0xE1
 #define ROSA_GET_WIFI_CONFIG 0xE2
 #define ROSA_SET_WIFI_INFO 0xE3
+#define ROSA_ENABLE_ROBOCLAWS 0xE4
 //ROSA->QT
 #define ROSA_NAME 0xF1
 #define ROSA_ROBOT_DATA 0xF2

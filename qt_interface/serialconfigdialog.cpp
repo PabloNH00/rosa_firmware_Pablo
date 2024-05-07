@@ -181,3 +181,8 @@ void SerialConfigDialog::on_B_Save_clicked()
 
     sendMessage(info_wifi_message(ROSA_SET_WIFI_INFO,w_data));
 }
+
+void SerialConfigDialog::on_checkBox_toggled(bool checked)
+{
+    sendMessage(ROSAmens(ROSA_ENABLE_ROBOCLAWS,!checked));
+}

@@ -56,6 +56,7 @@ class RobotDrive{
     //commanded
     int32_u target_velocity[4]{};
     void read_encoders();
+    void command_speed();
   public:
     void setup();
     void loop();
@@ -65,6 +66,7 @@ class RobotDrive{
     void set_velocity(float vx, float vy, float vr);
     void emergency_stop();
    void reset_odometry();
+   void enable(bool en=true){mock_hardware=!en;}
    Odometry get_odometry(){return Odometry{x_pos, y_pos, yaw};}
    RobotData get_robot_data();
    static void FK(const float v[4], float &vx, float &vy, float &vr);
