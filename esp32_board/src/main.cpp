@@ -134,6 +134,7 @@ ROSAmens proccess_message( ROSAmens &m)
         case ROSA_ENABLE_ROBOCLAWS:{
             auto val=m.read<uint8_t>();
             robot.enable(val);
+            break;
         }
         default:
             //unknown message
