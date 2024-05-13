@@ -5,15 +5,15 @@ void RobotDrive::setup(){
  RC_RIGHT_PORT.begin(RC_BAUD_RATE, SERIAL_8N1, RC_RIGHT_RX, RC_RIGHT_TX);
 }
 void RobotDrive::loop(){
-  static TIMER read_timer(50), command_timer(50); //20 times per sec
-  if(command_timer())command_speed();
-  else if(read_timer())read_encoders();
-    /*
-    rc_left.ReadISpeeds(RC_ID, 
-      current_velocity[m1_left].t_uint, current_velocity[m2_left].t_uint );
-    rc_right.ReadISpeeds(RC_ID, 
-      current_velocity[m1_right].t_uint, current_velocity[m2_right].t_uint );
-      */
+  static TIMER sinc_timer(50); //20 times per sec
+  if(sinc_timer()){
+  static int cuentas=0;
+  if(cuentas==0)command_speed();
+  if(cuentas==1)read_encoders();
+
+  if(++cuentas>1)cuentas=0;
+  }
+
 }
 void RobotDrive::emergency_stop(){
     for (auto &v:target_velocity)v.t_int=0;
@@ -87,9 +87,12 @@ void RobotDrive::read_encoders(){
   float angs[4]{}; //radians
 
   if(mock_hardware)return; //this should be modified to emulate the encoders
+  bool left = rc_left.ReadEncoders(RC_ID, encs[0].t_uint,encs[1].t_uint);
+  bool right = rc_right.ReadEncoders(RC_ID, encs[2].t_uint,encs[3].t_uint);
+  if(left)WIFI_DEBUG("LEFT LEIDO");
+  if(right)WIFI_DEBUG("RIGHT LEIDO");
 
-  if(rc_left.ReadEncoders(RC_ID, encs[0].t_uint,encs[1].t_uint) && 
-     rc_right.ReadEncoders(RC_ID, encs[2].t_uint,encs[3].t_uint)){
+  if(left && right){
      //odometry is computed, and enc counts updated only if all readings are ok 
      Serial.printf("m1:%d\n",encs[0].t_int);
      for(int i=0;i<4;i++){
@@ -122,10 +125,10 @@ RobotData RobotDrive::get_robot_data(){
 
     //solo para ver como va
   static int contador=0;
-  for (auto &v:target_velocity)v.t_int=contador++;
+  /*for (auto &v:target_velocity)v.t_int=contador++;
   for (auto &v:current_velocity)v.t_int=contador++;
   for (auto &v:encoder_counts)v.t_int=contador++;
-  battery_voltage=12.0 + sin(contador/10);
+  battery_voltage=12.0 + sin(contador/10);*/
   
   return RobotData{
   {current_velocity[0].t_int, current_velocity[1].t_int,current_velocity[2].t_int,current_velocity[3].t_int},
