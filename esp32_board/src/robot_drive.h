@@ -1,9 +1,10 @@
 #pragma once
 #include <Arduino.h>
 #include "RoboClaw.h"
+#include "robo_claw.h"
 #include "rosa_messages.h"
 #define RC_BAUD_RATE 38400
-#define RC_TIMEOUT 1000 //1s of coms timeout
+
 //motors should work at 3K rpm as max
 //encoders 300 cpr  si es enc simple 15K si x4 60K
 constexpr int ENC_CPR  = 300;
@@ -44,8 +45,11 @@ struct Odometry{
 };
 
 class RobotDrive{
-    RoboClaw rc_left =  RoboClaw(&RC_LEFT_PORT, RC_TIMEOUT);
-    RoboClaw rc_right = RoboClaw(&RC_RIGHT_PORT,RC_TIMEOUT);
+    //RoboClaw rc_left =  RoboClaw(&RC_LEFT_PORT, RC_TIMEOUT);
+    //RoboClaw rc_right = RoboClaw(&RC_RIGHT_PORT,RC_TIMEOUT);
+
+    RoboClawDriver rc_left{RC_LEFT_PORT, RC_BAUD_RATE, RC_ID};
+    RoboClawDriver rc_right{RC_RIGHT_PORT, RC_BAUD_RATE, RC_ID};
     //internal state vars
     bool mock_hardware = false; //set to true to run in a ESP32 without robot
     bool move_commands_enabled = true;

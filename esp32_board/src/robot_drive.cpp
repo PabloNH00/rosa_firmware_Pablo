@@ -1,24 +1,31 @@
 #include "robot_drive.h"
 #include "rosa_esp32_utils.h"
 void RobotDrive::setup(){
- RC_LEFT_PORT.begin(RC_BAUD_RATE, SERIAL_8N1, RC_LEFT_RX, RC_LEFT_TX);
- RC_RIGHT_PORT.begin(RC_BAUD_RATE, SERIAL_8N1, RC_RIGHT_RX, RC_RIGHT_TX);
+ //RC_LEFT_PORT.begin(RC_BAUD_RATE, SERIAL_8N1, RC_LEFT_RX, RC_LEFT_TX);
+ //RC_RIGHT_PORT.begin(RC_BAUD_RATE, SERIAL_8N1, RC_RIGHT_RX, RC_RIGHT_TX);
+ rc_left.begin(RC_LEFT_RX, RC_LEFT_TX);
+ rc_right.begin(RC_RIGHT_RX, RC_RIGHT_TX);
 }
 void RobotDrive::loop(){
-  static TIMER sinc_timer(50); //20 times per sec
+  static TIMER sinc_timer(50), bat_timer(1000); //20 times per sec,1 per sec
   if(sinc_timer()){
-  static int cuentas=0;
-  if(cuentas==0)command_speed();
-  if(cuentas==1)read_encoders();
-
-  if(++cuentas>1)cuentas=0;
+    static int cuentas=0;
+    if(cuentas==0)command_speed();
+    if(cuentas==1)read_encoders();
+    if(++cuentas>1)cuentas=0;
+  }else
+  if(bat_timer()){
+    if(!mock_hardware)rc_left.read_battery(battery_voltage);
+    else battery_voltage=(battery_voltage>14?12:battery_voltage+0.1);
   }
 
 }
 void RobotDrive::emergency_stop(){
     for (auto &v:target_velocity)v.t_int=0;
-    rc_left.SpeedM1M2(RC_ID,0,0);
-    rc_right.SpeedM1M2(RC_ID,0,0);
+    //rc_left.SpeedM1M2(RC_ID,0,0);
+    //rc_right.SpeedM1M2(RC_ID,0,0);
+    rc_left.set_speeds(0,0);
+    rc_right.set_speeds(0,0);
 }
 //verified with multiple tests IK->FK->IK
 //the loss of gdl have to be considered inb order to correctly test the IK
@@ -74,10 +81,12 @@ void RobotDrive::set_velocity(float vx, float vy, float vr)
 }
 void RobotDrive::command_speed(){
   if(mock_hardware)return;
-    rc_left.SpeedM1M2(RC_ID,
+    /*rc_left.SpeedM1M2(RC_ID,
       target_velocity[m1_left].t_uint, target_velocity[m2_left].t_uint );
     rc_right.SpeedM1M2(RC_ID,
-      target_velocity[m1_right].t_uint, target_velocity[m2_right].t_uint );
+      target_velocity[m1_right].t_uint, target_velocity[m2_right].t_uint );*/
+  rc_left.set_speeds(target_velocity[m1_left].t_int, target_velocity[m2_left].t_int);
+  rc_right.set_speeds(target_velocity[m1_right].t_int, target_velocity[m2_right].t_int);
 }
 //if needed it is possible to deal  with overflows and unerflows (use ReqdM1Encoder instead)
 //overflow, underflow will happen after 84Km so probably it is not neccesary
@@ -87,8 +96,10 @@ void RobotDrive::read_encoders(){
   float angs[4]{}; //radians
 
   if(mock_hardware)return; //this should be modified to emulate the encoders
-  bool left = rc_left.ReadEncoders(RC_ID, encs[0].t_uint,encs[1].t_uint);
-  bool right = rc_right.ReadEncoders(RC_ID, encs[2].t_uint,encs[3].t_uint);
+  /*bool left = rc_left.ReadEncoders(RC_ID, encs[0].t_uint,encs[1].t_uint);
+  bool right = rc_right.ReadEncoders(RC_ID, encs[2].t_uint,encs[3].t_uint);*/
+  bool left = rc_left.read_encoders(encs[0].t_uint,encs[1].t_uint);
+  bool right = rc_right.read_encoders(encs[2].t_uint,encs[3].t_uint);
   if(left)WIFI_DEBUG("LEFT LEIDO");
   if(right)WIFI_DEBUG("RIGHT LEIDO");
 
@@ -117,8 +128,10 @@ void RobotDrive::reset_odometry(){
   for(auto &enc:encoder_counts)enc.t_int=0;
   x_pos=y_pos=yaw=0.0F;
   if(mock_hardware)return;
-  rc_left.ResetEncoders(RC_ID);
-  rc_right.ResetEncoders(RC_ID);
+  //rc_left.ResetEncoders(RC_ID);
+  //rc_right.ResetEncoders(RC_ID);
+  rc_left.reset_encoders();
+  rc_right.reset_encoders();
 }
 
 RobotData RobotDrive::get_robot_data(){
