@@ -44,6 +44,18 @@ void SerialConfigDialog::loop()
         if(counter<100)counter++;
     }
     update_gui();
+    cmd_buttons();
+}
+void SerialConfigDialog::cmd_buttons(){
+    if(state!=CORRECT)return;
+    float vel=(ui->S_vel->value())/100.0F;
+    if(ui->B_U->isDown())sendMessage(cmd_vel_message(vel, 0, 0));
+    if(ui->B_D->isDown())sendMessage(cmd_vel_message(-vel, 0, 0));
+    if(ui->B_R->isDown())sendMessage(cmd_vel_message(0, -vel, 0));
+    if(ui->B_L->isDown())sendMessage(cmd_vel_message(0, vel, 0));
+    if(ui->B_CW->isDown())sendMessage(cmd_vel_message(0, 0, vel));
+    if(ui->B_CCW->isDown())sendMessage(cmd_vel_message(0, 0, -vel));
+
 }
 void SerialConfigDialog::handle_serial_port()
 {
@@ -185,4 +197,14 @@ void SerialConfigDialog::on_B_Save_clicked()
 void SerialConfigDialog::on_checkBox_toggled(bool checked)
 {
     sendMessage(ROSAmens(ROSA_ENABLE_ROBOCLAWS,!checked));
+}
+
+void SerialConfigDialog::on_pushButton_clicked()
+{
+    sendMessage(ROSAmens(ROSA_RESET_ODOMETRY));
+}
+
+void SerialConfigDialog::on_B_S_clicked()
+{
+    sendMessage(ROSAmens(ROSA_STOP));
 }

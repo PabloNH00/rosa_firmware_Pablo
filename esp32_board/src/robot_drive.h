@@ -1,6 +1,5 @@
 #pragma once
 #include <Arduino.h>
-#include "RoboClaw.h"
 #include "robo_claw.h"
 #include "rosa_messages.h"
 #define RC_BAUD_RATE 38400
@@ -45,9 +44,6 @@ struct Odometry{
 };
 
 class RobotDrive{
-    //RoboClaw rc_left =  RoboClaw(&RC_LEFT_PORT, RC_TIMEOUT);
-    //RoboClaw rc_right = RoboClaw(&RC_RIGHT_PORT,RC_TIMEOUT);
-
     RoboClawDriver rc_left{RC_LEFT_PORT, RC_BAUD_RATE, RC_ID};
     RoboClawDriver rc_right{RC_RIGHT_PORT, RC_BAUD_RATE, RC_ID};
     //internal state vars

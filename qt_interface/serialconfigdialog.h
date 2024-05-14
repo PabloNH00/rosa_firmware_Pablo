@@ -29,6 +29,10 @@ private slots:
 
      void on_checkBox_toggled(bool checked);
 
+     void on_pushButton_clicked();
+
+     void on_B_S_clicked();
+
 private:
     Ui::SerialConfigDialog *ui;
     QTimer timer;
@@ -41,6 +45,7 @@ private:
     WiFiData w_data{};
 
     void handle_serial_port();
+    void cmd_buttons();
     void sendMessage(const ROSAmens &m);
     void update_gui_wifi_data();
 

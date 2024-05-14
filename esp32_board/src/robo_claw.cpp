@@ -1,7 +1,7 @@
 #include "robo_claw.h"
 #include "rosa_esp32_utils.h"
-uint16_t RoboClawDriver::crc16(uint8_t *packet, uint8_t nBytes){
-    uint16_t crc=0;
+uint16_t RoboClawDriver::crc16(uint8_t *packet, uint8_t nBytes, uint16_t ini){
+    uint16_t crc=ini;
     for (size_t byte = 0; byte < nBytes; byte++) {
         crc = crc ^ ((uint16_t) packet[byte] << 8);
         for (uint8_t bit = 0; bit < 8; bit++) {
@@ -67,9 +67,9 @@ bool RoboClawDriver::read_command(uint8_t cmd, bool tx_crc, uint8_t *rxbuffer, u
     uint8_t packet[4]{ID,cmd};
     clr_rx();
     if(tx_crc){
-        add_crc16(packet,sizeof(packet)-2);
-        port.write(packet,sizeof(packet));
-    }else port.write(packet,sizeof(packet-2));
+        add_crc16(packet,2);
+        port.write(packet,4);
+    }else port.write(packet,2);
     
     uint32_t start = micros();
     uint8_t n=0;
@@ -81,8 +81,9 @@ bool RoboClawDriver::read_command(uint8_t cmd, bool tx_crc, uint8_t *rxbuffer, u
     DEBUG_PRINTF("READ ERR: esperados%d leidos%d\n",rx_n,n);
     return false;
     }
-    //check crc
-    uint16_t crc=crc16(rxbuffer,n-2);
+    //check crc READ crc should include the sent bytrs
+    uint16_t crc=crc16(packet,2);
+    crc=crc16(rxbuffer,n-2,crc);
     uint16_t crc_rx=((int16_t)(rxbuffer[rx_n-2]) << 8)|(rxbuffer[rx_n-1]);
     if(crc!=crc_rx) DEBUG_PRINTF("CRC ERR: esperados%d leidos%d\n",crc,crc_rx);
     return (crc==crc_rx);		 

@@ -133,6 +133,9 @@
       <height>23</height>
      </rect>
     </property>
+    <property name="digitCount">
+     <number>9</number>
+    </property>
     <property name="segmentStyle">
      <enum>QLCDNumber::Flat</enum>
     </property>
@@ -171,6 +174,9 @@
       <width>64</width>
       <height>23</height>
      </rect>
+    </property>
+    <property name="digitCount">
+     <number>9</number>
     </property>
     <property name="segmentStyle">
      <enum>QLCDNumber::Flat</enum>
@@ -211,6 +217,9 @@
       <height>23</height>
      </rect>
     </property>
+    <property name="digitCount">
+     <number>9</number>
+    </property>
     <property name="segmentStyle">
      <enum>QLCDNumber::Flat</enum>
     </property>
@@ -250,6 +259,9 @@
       <height>23</height>
      </rect>
     </property>
+    <property name="digitCount">
+     <number>9</number>
+    </property>
     <property name="segmentStyle">
      <enum>QLCDNumber::Flat</enum>
     </property>
@@ -258,7 +270,7 @@
     <property name="geometry">
      <rect>
       <x>130</x>
-      <y>180</y>
+      <y>160</y>
       <width>64</width>
       <height>23</height>
      </rect>
@@ -310,7 +322,7 @@
     <property name="geometry">
      <rect>
       <x>30</x>
-      <y>180</y>
+      <y>160</y>
       <width>81</width>
       <height>16</height>
      </rect>
@@ -398,6 +410,76 @@
     </property>
     <property name="text">
      <string>WiFi ESP32 config</string>
+    </property>
+   </widget>
+   <widget class="QLCDNumber" name="odom_x">
+    <property name="geometry">
+     <rect>
+      <x>130</x>
+      <y>200</y>
+      <width>64</width>
+      <height>23</height>
+     </rect>
+    </property>
+    <property name="smallDecimalPoint">
+     <bool>true</bool>
+    </property>
+    <property name="digitCount">
+     <number>6</number>
+    </property>
+    <property name="segmentStyle">
+     <enum>QLCDNumber::Flat</enum>
+    </property>
+   </widget>
+   <widget class="QLCDNumber" name="odom_y">
+    <property name="geometry">
+     <rect>
+      <x>220</x>
+      <y>200</y>
+      <width>64</width>
+      <height>23</height>
+     </rect>
+    </property>
+    <property name="smallDecimalPoint">
+     <bool>true</bool>
+    </property>
+    <property name="digitCount">
+     <number>6</number>
+    </property>
+    <property name="segmentStyle">
+     <enum>QLCDNumber::Flat</enum>
+    </property>
+   </widget>
+   <widget class="QLCDNumber" name="odom_yaw">
+    <property name="geometry">
+     <rect>
+      <x>310</x>
+      <y>200</y>
+      <width>64</width>
+      <height>23</height>
+     </rect>
+    </property>
+    <property name="smallDecimalPoint">
+     <bool>true</bool>
+    </property>
+    <property name="digitCount">
+     <number>6</number>
+    </property>
+    <property name="segmentStyle">
+     <enum>QLCDNumber::Flat</enum>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_10">
+    <property name="geometry">
+     <rect>
+      <x>30</x>
+      <y>200</y>
+      <width>81</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Odometry</string>
     </property>
    </widget>
   </widget>

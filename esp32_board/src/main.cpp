@@ -23,6 +23,8 @@ void send_wifi_regular_messages()
 {
 if(!RosaWiFi::isConected2Master())return;
 RosaWiFi::sendMessage(robot_data_message(robot.get_robot_data()));
+auto [x, y,yaw] = robot.get_odometry();
+RosaWiFi::sendMessage(odometry_message(x, y,yaw));
 }
 void setup()
  {
@@ -106,10 +108,16 @@ ROSAmens proccess_message( ROSAmens &m)
             //message of CMD_VEL interpretation, get values
             auto vx=m.read<float>(), vy=m.read<float>(), vr=m.read<float>();
             //do something with that values...
+            //DEBUG_PRINTF("cmd_vel:%4.2f %4.2f %4.2f",vx,vy,vr);
             robot.set_velocity(vx,vy,vr);
         }break;
+        case ROSA_STOP: 
+            WIFI_DEBUG("EMERGENCY STOP");
+            robot.emergency_stop();
+        break;
         case ROSA_RESET_ODOMETRY:
             //message that resets the robot odometry
+            WIFI_DEBUG("RESET ODOMETRY");
             robot.reset_odometry();
         break;
         case ROSA_GET_WIFI_CONFIG:{

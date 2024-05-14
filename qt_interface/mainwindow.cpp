@@ -80,6 +80,12 @@ void MainWindow::process_message(ROSAmens &m)
             rd.battery_voltage= m.read<float>();
             update_robot_data(rd);
         }break;
+    case ROSA_ODOMETRY:
+
+        ui->odom_x->display(QString::number(m.read<float>(), 'f', 3));
+        ui->odom_y->display(QString::number(m.read<float>(), 'f', 3));
+        ui->odom_yaw->display(QString::number(m.read<float>(), 'f', 3));
+        break;
     }
 }
 void MainWindow::update_robot_data(const RobotData &data){

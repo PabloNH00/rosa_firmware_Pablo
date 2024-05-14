@@ -11,7 +11,7 @@ class RoboClawDriver{
     uint baudrate;
     uint8_t ID;
     void clr_rx();
-    static uint16_t crc16(uint8_t *packet, uint8_t nBytes);
+    static uint16_t crc16(uint8_t *packet, uint8_t nBytes, uint16_t ini=0);
     static void add_crc16(uint8_t *packet, uint8_t n){
         auto crc=crc16(packet,n);
         packet[n]=(uint8_t)((crc>>8)&0xFF);

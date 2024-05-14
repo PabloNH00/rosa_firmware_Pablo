@@ -1,8 +1,6 @@
 #include "robot_drive.h"
 #include "rosa_esp32_utils.h"
 void RobotDrive::setup(){
- //RC_LEFT_PORT.begin(RC_BAUD_RATE, SERIAL_8N1, RC_LEFT_RX, RC_LEFT_TX);
- //RC_RIGHT_PORT.begin(RC_BAUD_RATE, SERIAL_8N1, RC_RIGHT_RX, RC_RIGHT_TX);
  rc_left.begin(RC_LEFT_RX, RC_LEFT_TX);
  rc_right.begin(RC_RIGHT_RX, RC_RIGHT_TX);
 }
@@ -22,8 +20,7 @@ void RobotDrive::loop(){
 }
 void RobotDrive::emergency_stop(){
     for (auto &v:target_velocity)v.t_int=0;
-    //rc_left.SpeedM1M2(RC_ID,0,0);
-    //rc_right.SpeedM1M2(RC_ID,0,0);
+    if(mock_hardware)return;
     rc_left.set_speeds(0,0);
     rc_right.set_speeds(0,0);
 }
@@ -46,18 +43,10 @@ inline void RobotDrive::IK(const float &vx, const float &vy, const float &vr, fl
 void RobotDrive::set_relative_velocity(float vx, float vy, float vr)
 {
     if(!move_commands_enabled)return; //nothing is executed
-    
     //compute vx, vy, vr
     float vm[4] ; IK(vx*MAX_FORWARD_SPEED, vy*MAX_LATERAL_SPEED, vr*MAX_ROT_SPEED, vm);
-
-    //normalization to RC_MAX_MOTOR_SPEED
-    //float max=0;
-    //for(auto v:vm)max=fabs(v)>max?fabs(v):max;
-    //if(max>MAX_MOTOR_SPEED) for(auto &v:vm)v/=max;
-
     //scale to the roboclaw units: transform rads/sec to encoders speeds
     for(auto &v:vm)v*=RADS_2_CPR*factor_speed;
-
     //store as integers in counts per sec
     for(int i=0;i<4;i++)target_velocity[i].t_int=static_cast<int32_t>(vm[i]);
     
@@ -71,44 +60,49 @@ void RobotDrive::set_velocity(float vx, float vy, float vr)
     
     //compute the motors speeds as function of vx, vy, vr
     float vm[4]; IK(vx, vy, vr, vm);
-
     //scale to the roboclaw units: transform rads/sec to encoders speeds
     for(auto &v:vm)v*=RADS_2_CPR;
-
     //store as integers in counts per sec
-    for(int i=0;i<4;i++)target_velocity[0].t_int=static_cast<int32_t>(vm[i]);
+    for(int i=0;i<4;i++)target_velocity[i].t_int=static_cast<int32_t>(vm[i]);
 
 }
 void RobotDrive::command_speed(){
   if(mock_hardware)return;
-    /*rc_left.SpeedM1M2(RC_ID,
-      target_velocity[m1_left].t_uint, target_velocity[m2_left].t_uint );
-    rc_right.SpeedM1M2(RC_ID,
-      target_velocity[m1_right].t_uint, target_velocity[m2_right].t_uint );*/
   rc_left.set_speeds(target_velocity[m1_left].t_int, target_velocity[m2_left].t_int);
   rc_right.set_speeds(target_velocity[m1_right].t_int, target_velocity[m2_right].t_int);
 }
+
 //if needed it is possible to deal  with overflows and unerflows (use ReqdM1Encoder instead)
 //overflow, underflow will happen after 84Km so probably it is not neccesary
 //it also computes in m the displacement of each wheel
 void RobotDrive::read_encoders(){
   int32_u encs[4];
   float angs[4]{}; //radians
-
-  if(mock_hardware)return; //this should be modified to emulate the encoders
-  /*bool left = rc_left.ReadEncoders(RC_ID, encs[0].t_uint,encs[1].t_uint);
-  bool right = rc_right.ReadEncoders(RC_ID, encs[2].t_uint,encs[3].t_uint);*/
-  bool left = rc_left.read_encoders(encs[0].t_uint,encs[1].t_uint);
-  bool right = rc_right.read_encoders(encs[2].t_uint,encs[3].t_uint);
-  if(left)WIFI_DEBUG("LEFT LEIDO");
-  if(right)WIFI_DEBUG("RIGHT LEIDO");
-
+  bool left{},right{};
+  if(mock_hardware){ //ENCODERS EMULATION
+    static auto last_time=millis();
+    float dt=(millis()-last_time)/1000.F;
+    last_time=millis();
+    left=right=true;
+    for(int i=0;i<4;i++){
+      constexpr int acc = 500;
+      auto v_err=target_velocity[i].t_int-current_velocity[i].t_int;
+      if(abs(v_err)<acc) current_velocity[i].t_int=target_velocity[i].t_int;
+      else current_velocity[i].t_int += (v_err >0 ? acc:-acc);
+      encs[i].t_int=encoder_counts[i].t_int+dt*current_velocity[i].t_int;
+    }
+  }  else  {
+    left = rc_left.read_encoders(encs[0].t_uint,encs[1].t_uint);
+    right = rc_right.read_encoders(encs[2].t_uint,encs[3].t_uint);
+    if(left)WIFI_DEBUG("LEFT LEIDO");
+    if(right)WIFI_DEBUG("RIGHT LEIDO");
+  }
   if(left && right){
      //odometry is computed, and enc counts updated only if all readings are ok 
-     Serial.printf("m1:%d\n",encs[0].t_int);
+     //DEBUG_PRINTF("m1:%d\n",encs[0].t_int);
      for(int i=0;i<4;i++){
         angs[i]=(encs[i].t_int-encoder_counts[i].t_int);
-        encoder_counts[i]=encs[i];
+        encoder_counts[i].t_int=encs[i].t_int;
      }
      //from encoder counts to rads 
      for(auto &r:angs)r*=CPR_2_RADS;
@@ -128,21 +122,12 @@ void RobotDrive::reset_odometry(){
   for(auto &enc:encoder_counts)enc.t_int=0;
   x_pos=y_pos=yaw=0.0F;
   if(mock_hardware)return;
-  //rc_left.ResetEncoders(RC_ID);
-  //rc_right.ResetEncoders(RC_ID);
   rc_left.reset_encoders();
   rc_right.reset_encoders();
 }
 
 RobotData RobotDrive::get_robot_data(){
-
-    //solo para ver como va
-  static int contador=0;
-  /*for (auto &v:target_velocity)v.t_int=contador++;
-  for (auto &v:current_velocity)v.t_int=contador++;
-  for (auto &v:encoder_counts)v.t_int=contador++;
-  battery_voltage=12.0 + sin(contador/10);*/
-  
+  if(mock_hardware)battery_voltage=23.+(millis()%20)*0.1F;
   return RobotData{
   {current_velocity[0].t_int, current_velocity[1].t_int,current_velocity[2].t_int,current_velocity[3].t_int},
   {target_velocity[0].t_int,target_velocity[1].t_int,target_velocity[2].t_int,target_velocity[3].t_int},
@@ -150,13 +135,3 @@ RobotData RobotDrive::get_robot_data(){
   battery_voltage
   };
 }
-/*
-notas del robogait:
-   
-   M1M2speed : 37
-   readnecoder Ispeed: 79
-   read intensitites: 49
-   read batery voltage: 24
-   read status: 90
-   
-*/

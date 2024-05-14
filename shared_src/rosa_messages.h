@@ -14,6 +14,7 @@ typedef SPS::Message<> ROSAmens;
 //ROS2->ROSA
 #define ROSA_CMD_VEL 0x91
 #define ROSA_RESET_ODOMETRY 0x92
+#define ROSA_STOP 0x93
 
 //QT->ROSA
 #define ROSA_SET_MASTER_IP 0xE1
@@ -42,6 +43,14 @@ inline ROSAmens odometry_message(float x, float y, float yaw)
     m.write<float>(x);
     m.write<float>(y);
     m.write<float>(yaw);
+    return m;
+}
+inline ROSAmens cmd_vel_message(float vx, float vy, float vyaw)
+{
+    ROSAmens m(ROSA_CMD_VEL);
+    m.write<float>(vx);
+    m.write<float>(vy);
+    m.write<float>(vyaw);
     return m;
 }
 struct RobotData{
