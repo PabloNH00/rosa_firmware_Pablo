@@ -1,6 +1,7 @@
-QT       += core gui serialport network
+QT       += core gui network serialport
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
+greaterThan(QT_MAJOR_VERSION, 5): QT += core5compat
 lessThan(QT_MAJOR_VERSION, 6):QMAKE_CXXFLAGS += "/bigobj"
 CONFIG += c++17
 

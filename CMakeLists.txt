@@ -17,7 +17,7 @@ find_package(rclcpp REQUIRED)
 find_package(std_msgs REQUIRED)
 find_package(geometry_msgs REQUIRED)
 
-find_package(Qt5 COMPONENTS Core Widgets Network REQUIRED)
+find_package(Qt5 COMPONENTS Core Widgets Network SerialPort REQUIRED)
 
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTOUIC ON)
@@ -49,7 +49,7 @@ ament_target_dependencies(rosa_qt_esp32
  )
 
 target_link_libraries(rosa_qt_esp32
- Qt5::Widgets Qt5::Core Qt5::Network
+ Qt5::Widgets Qt5::Core Qt5::Network Qt5::SerialPort
  )
  
  install(TARGETS

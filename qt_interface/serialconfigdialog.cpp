@@ -4,6 +4,8 @@
 #include "QDialogButtonBox"
 #include "QDebug"
 #include "QMessageBox"
+#include <QRegularExpression>
+
 SerialConfigDialog::SerialConfigDialog(QWidget *parent) :
     QDialog(parent),
     ui(new Ui::SerialConfigDialog)
@@ -18,16 +20,16 @@ SerialConfigDialog::SerialConfigDialog(QWidget *parent) :
 
 
     QString ipRange = "(?:[0-1]?[0-9]?[0-9]|2[0-4][0-9]|25[0-5])";
-    QRegExp ipRegex ("^" + ipRange
+    QRegularExpression ipRegex ("^" + ipRange
                      + "\\." + ipRange
                      + "\\." + ipRange
                      + "\\." + ipRange + "$");
 
-    QRegExpValidator *ipValidator = new QRegExpValidator(ipRegex, this);
+    QRegularExpressionValidator *ipValidator = new QRegularExpressionValidator(ipRegex, this);
     ui->edit_ip->setValidator(ipValidator);
-    QRegExpValidator *gatewayValidator = new QRegExpValidator(ipRegex, this);
+    QRegularExpressionValidator *gatewayValidator = new QRegularExpressionValidator(ipRegex, this);
     ui->edit_ip->setValidator(gatewayValidator);
-    QRegExpValidator *maskValidator = new QRegExpValidator(ipRegex, this);
+    QRegularExpressionValidator *maskValidator = new QRegularExpressionValidator(ipRegex, this);
     ui->edit_ip->setValidator(maskValidator);
 
     timer.start(50);
