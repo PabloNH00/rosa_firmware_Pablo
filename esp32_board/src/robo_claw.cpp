@@ -1,5 +1,5 @@
 #include "robo_claw.h"
-
+#include "rosa_esp32_utils.h"
 uint16_t RoboClawDriver::crc16(uint8_t *packet, uint8_t nBytes){
     uint16_t crc=0;
     for (size_t byte = 0; byte < nBytes; byte++) {
@@ -73,13 +73,17 @@ bool RoboClawDriver::read_command(uint8_t cmd, bool tx_crc, uint8_t *rxbuffer, u
     
     uint32_t start = micros();
     uint8_t n=0;
-	while((micros()-start)>RC_TIMEOUT2*rx_n){
+	while((micros()-start)<RC_TIMEOUT+RC_TIMEOUT2*rx_n){
         if(port.available())rxbuffer[n++]=port.read();
         if(n==rx_n)break;
     }
-    if(rx_n!=n)return false;
+    if(rx_n!=n){
+    DEBUG_PRINTF("READ ERR: esperados%d leidos%d\n",rx_n,n);
+    return false;
+    }
     //check crc
     uint16_t crc=crc16(rxbuffer,n-2);
-    uint16_t crc_rx=(rxbuffer[n-2] << 8) + rxbuffer[n-1];
+    uint16_t crc_rx=((int16_t)(rxbuffer[rx_n-2]) << 8)|(rxbuffer[rx_n-1]);
+    if(crc!=crc_rx) DEBUG_PRINTF("CRC ERR: esperados%d leidos%d\n",crc,crc_rx);
     return (crc==crc_rx);		 
 }

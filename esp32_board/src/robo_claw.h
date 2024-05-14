@@ -2,8 +2,8 @@
 
 
 
-#define RC_TIMEOUT 1000 //1ms of coms timeout
-#define RC_TIMEOUT2 500 //us
+#define RC_TIMEOUT 1500 //1ms of coms timeout
+#define RC_TIMEOUT2 500 //us per byte
 
 enum  RC_CMDS:uint8_t{CMD_RESET_ENC=20, CMD_READ_BATTERY=24, CMD_SPEEDS=37, CMD_READ_ENCODERS=78};
 class RoboClawDriver{
