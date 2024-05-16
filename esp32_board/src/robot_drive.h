@@ -2,8 +2,10 @@
 #include <Arduino.h>
 #include "robo_claw.h"
 #include "rosa_messages.h"
-#define RC_BAUD_RATE 38400
+#include "rosa_esp32_utils.h"
 
+#define RC_BAUD_RATE 38400
+constexpr uint16_t ROBOT_DRIVER_WATCHDOG = 2000;
 //motors should work at 3K rpm as max
 //encoders 300 cpr  si es enc simple 15K si x4 60K
 constexpr int ENC_CPR  = 300;
@@ -57,6 +59,7 @@ class RobotDrive{
     int32_u target_velocity[4]{};
     void read_encoders();
     void command_speed();
+    TIMER watch_dog{ROBOT_DRIVER_WATCHDOG};
   public:
     void setup();
     void loop();

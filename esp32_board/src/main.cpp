@@ -53,7 +53,6 @@ void setup()
     {
         //deberia incluir un timeout que detecte si hay comunicacion
         auto [x, y,yaw] = robot.get_odometry();
-        //Serial.printf("x:%5.2F y:%5.2f yaw:%5.2F \n",x,y,yaw);
         //DEBUG_PRINTF("x:%5.2F y:%5.2f yaw:%5.2F",x,y,yaw);
         send_message(odometry_message(x,y,yaw));
         

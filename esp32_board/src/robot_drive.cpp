@@ -1,11 +1,11 @@
 #include "robot_drive.h"
-#include "rosa_esp32_utils.h"
+
 void RobotDrive::setup(){
  rc_left.begin(RC_LEFT_RX, RC_LEFT_TX);
  rc_right.begin(RC_RIGHT_RX, RC_RIGHT_TX);
 }
 void RobotDrive::loop(){
-  static TIMER sinc_timer(50), bat_timer(1000); //20 times per sec,1 per sec
+  static TIMER sinc_timer(50), bat_timer(1000); 
   if(sinc_timer()){
     static int cuentas=0;
     if(cuentas==0)command_speed();
@@ -16,7 +16,8 @@ void RobotDrive::loop(){
     if(!mock_hardware)rc_left.read_battery(battery_voltage);
     else battery_voltage=(battery_voltage>14?12:battery_voltage+0.1);
   }
-
+  //softly stops the robot
+  if(watch_dog())set_velocity(0,0,0); 
 }
 void RobotDrive::emergency_stop(){
     for (auto &v:target_velocity)v.t_int=0;
@@ -39,23 +40,19 @@ inline void RobotDrive::IK(const float &vx, const float &vy, const float &vr, fl
   vm[2] = (vx +vr  +vy*LXY)/MEC_RAD; 
   vm[3] = (vx -vr  -vy*LXY)/MEC_RAD;
 }
-//Sets the robot speed proportional to the maximun speed (-1.0, 1.0)
+//Sets the robot speed proportional to the maximun speeds (-1.0, 1.0)
 void RobotDrive::set_relative_velocity(float vx, float vy, float vr)
 {
-    if(!move_commands_enabled)return; //nothing is executed
-    //compute vx, vy, vr
-    float vm[4] ; IK(vx*MAX_FORWARD_SPEED, vy*MAX_LATERAL_SPEED, vr*MAX_ROT_SPEED, vm);
-    //scale to the roboclaw units: transform rads/sec to encoders speeds
-    for(auto &v:vm)v*=RADS_2_CPR*factor_speed;
-    //store as integers in counts per sec
-    for(int i=0;i<4;i++)target_velocity[i].t_int=static_cast<int32_t>(vm[i]);
-    
-          
-
+    vx*=MAX_FORWARD_SPEED*factor_speed;
+    vy*=MAX_LATERAL_SPEED*factor_speed;
+    vr*=MAX_ROT_SPEED*factor_speed;
+    set_velocity(vx,vy,vr);
 }
-//Sets the robot speed proportional to the maximun speed (-1.0, 1.0)
+
+//Sets the robot speed m/sec rads/sec
 void RobotDrive::set_velocity(float vx, float vy, float vr)
 {
+    watch_dog.reset(); //needed. otherwise the robot will stop
     if(!move_commands_enabled)return; //nothing is executed
     
     //compute the motors speeds as function of vx, vy, vr

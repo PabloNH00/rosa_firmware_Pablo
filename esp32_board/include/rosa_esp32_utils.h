@@ -29,6 +29,8 @@ class TIMER{
     }
   return false;
   }
+  //useful to implement a polling watchdog
+  void reset(){lt=millis();}
 };
 
   
