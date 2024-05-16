@@ -58,6 +58,7 @@ class RobotDrive{
     //commanded
     int32_u target_velocity[4]{};
     void read_encoders();
+    void read_speeds();
     void command_speed();
     TIMER watch_dog{ROBOT_DRIVER_WATCHDOG};
   public:

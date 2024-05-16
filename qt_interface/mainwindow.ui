@@ -107,6 +107,9 @@
     <property name="lineWidth">
      <number>1</number>
     </property>
+    <property name="digitCount">
+     <number>7</number>
+    </property>
     <property name="segmentStyle">
      <enum>QLCDNumber::Flat</enum>
     </property>
@@ -119,6 +122,12 @@
       <width>64</width>
       <height>23</height>
      </rect>
+    </property>
+    <property name="smallDecimalPoint">
+     <bool>false</bool>
+    </property>
+    <property name="digitCount">
+     <number>7</number>
     </property>
     <property name="segmentStyle">
      <enum>QLCDNumber::Flat</enum>
@@ -149,6 +158,9 @@
       <height>23</height>
      </rect>
     </property>
+    <property name="digitCount">
+     <number>7</number>
+    </property>
     <property name="segmentStyle">
      <enum>QLCDNumber::Flat</enum>
     </property>
@@ -161,6 +173,9 @@
       <width>64</width>
       <height>23</height>
      </rect>
+    </property>
+    <property name="digitCount">
+     <number>7</number>
     </property>
     <property name="segmentStyle">
      <enum>QLCDNumber::Flat</enum>
@@ -191,6 +206,9 @@
       <height>23</height>
      </rect>
     </property>
+    <property name="digitCount">
+     <number>7</number>
+    </property>
     <property name="segmentStyle">
      <enum>QLCDNumber::Flat</enum>
     </property>
@@ -203,6 +221,9 @@
       <width>64</width>
       <height>23</height>
      </rect>
+    </property>
+    <property name="digitCount">
+     <number>7</number>
     </property>
     <property name="segmentStyle">
      <enum>QLCDNumber::Flat</enum>
@@ -233,6 +254,9 @@
       <height>23</height>
      </rect>
     </property>
+    <property name="digitCount">
+     <number>7</number>
+    </property>
     <property name="segmentStyle">
      <enum>QLCDNumber::Flat</enum>
     </property>
@@ -245,6 +269,9 @@
       <width>64</width>
       <height>23</height>
      </rect>
+    </property>
+    <property name="digitCount">
+     <number>7</number>
     </property>
     <property name="segmentStyle">
      <enum>QLCDNumber::Flat</enum>
@@ -489,7 +516,7 @@
      <x>0</x>
      <y>0</y>
      <width>549</width>
-     <height>21</height>
+     <height>26</height>
     </rect>
    </property>
   </widget>

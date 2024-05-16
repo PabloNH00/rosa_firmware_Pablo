@@ -5,12 +5,13 @@ void RobotDrive::setup(){
  rc_right.begin(RC_RIGHT_RX, RC_RIGHT_TX);
 }
 void RobotDrive::loop(){
-  static TIMER sinc_timer(50), bat_timer(1000); 
+  static TIMER sinc_timer(20), bat_timer(1000); 
   if(sinc_timer()){
     static int cuentas=0;
     if(cuentas==0)command_speed();
     if(cuentas==1)read_encoders();
-    if(++cuentas>1)cuentas=0;
+    if(cuentas==2)read_speeds();
+    if(++cuentas>2)cuentas=0;
   }else
   if(bat_timer()){
     if(!mock_hardware)rc_left.read_battery(battery_voltage);
@@ -68,7 +69,14 @@ void RobotDrive::command_speed(){
   rc_left.set_speeds(target_velocity[m1_left].t_int, target_velocity[m2_left].t_int);
   rc_right.set_speeds(target_velocity[m1_right].t_int, target_velocity[m2_right].t_int);
 }
-
+void  RobotDrive::read_speeds()
+{
+  if(mock_hardware)return;
+  if(!rc_left.read_speeds(current_velocity[0].t_int,current_velocity[1].t_int))
+    WIFI_DEBUG("ERROR reading left speed");
+  if(!rc_right.read_speeds(current_velocity[2].t_int,current_velocity[3].t_int))
+    WIFI_DEBUG("ERROR reading rigt speed");
+}
 //if needed it is possible to deal  with overflows and unerflows (use ReqdM1Encoder instead)
 //overflow, underflow will happen after 84Km so probably it is not neccesary
 //it also computes in m the displacement of each wheel
@@ -91,8 +99,8 @@ void RobotDrive::read_encoders(){
   }  else  {
     left = rc_left.read_encoders(encs[0].t_uint,encs[1].t_uint);
     right = rc_right.read_encoders(encs[2].t_uint,encs[3].t_uint);
-    if(left)WIFI_DEBUG("LEFT LEIDO");
-    if(right)WIFI_DEBUG("RIGHT LEIDO");
+    if(!left)WIFI_DEBUG("ERROR Lectura enc LEFT ");
+    if(!right)WIFI_DEBUG("ERROR Lectura enc RIGHT");
   }
   if(left && right){
      //odometry is computed, and enc counts updated only if all readings are ok 

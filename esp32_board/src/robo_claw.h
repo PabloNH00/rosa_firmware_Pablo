@@ -5,7 +5,14 @@
 #define RC_TIMEOUT 1500 //1ms of coms timeout
 #define RC_TIMEOUT2 500 //us per byte
 
-enum  RC_CMDS:uint8_t{CMD_RESET_ENC=20, CMD_READ_BATTERY=24, CMD_SPEEDS=37, CMD_READ_ENCODERS=78};
+enum  RC_CMDS:uint8_t{
+    CMD_RESET_ENC=20, 
+    CMD_READ_BATTERY=24, 
+    CMD_SPEEDS=37, 
+    CMD_READ_ENCODERS=78,
+    CMD_READ_M1_SPEED=18,
+    CMD_READ_M2_SPEED=19
+    };
 class RoboClawDriver{
     HardwareSerial &port;
     uint baudrate;
@@ -31,6 +38,7 @@ class RoboClawDriver{
     }
     bool reset_encoders(){ return command(CMD_RESET_ENC);}
     bool set_speeds(int m1, int m2){ return command(CMD_SPEEDS,m1,m2);}
+    bool read_speeds(int32_t& s1, int32_t& s2);
     bool read_encoders(uint32_t& e1, uint32_t& e2);
     bool read_battery(float &bat);
     

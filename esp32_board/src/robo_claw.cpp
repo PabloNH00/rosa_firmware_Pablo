@@ -52,6 +52,16 @@ bool RoboClawDriver::read_encoders(uint32_t& e1, uint32_t& e2)
     }
     return false;
 }
+bool RoboClawDriver::read_speeds(int32_t& s1, int32_t& s2)
+{
+    uint8_t rx[7];
+    bool res{};
+    if(res=read_command(CMD_READ_M1_SPEED, false, rx, 7))
+        s1= (rx[0]<<24)|(rx[1]<<16)|(rx[2]<<8)|(rx[3])*(rx[4]?-1:1); 
+    if(res&=read_command(CMD_READ_M2_SPEED, false, rx, 7))
+        s2= (rx[0]<<24)|(rx[1]<<16)|(rx[2]<<8)|(rx[3])*(rx[4]?-1:1);   
+    return res;
+}
 bool RoboClawDriver::read_battery(float &bat)
 {
     uint8_t rx[4];
