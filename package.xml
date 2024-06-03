@@ -19,7 +19,7 @@
  <!--rosa_qt_esp32 dependencies-->
 <build_depend>qtbase5-dev</build_depend>
 <build_depend>qt5-qmake</build_depend>
-<build_depend>qt5serialport5-dev</build_depend>
+<!--  <build_depend>qt5serialport5-dev</build_depend>  -->
 
 <exec_depend>libqt5-core</exec_depend>
 
