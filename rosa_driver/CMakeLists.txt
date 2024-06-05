@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.5)
-#project(robotont_driver)
+
 
 if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
   add_compile_options(-Wall -Wextra -Wpedantic)
@@ -24,12 +24,21 @@ ament_auto_find_build_dependencies()
 #find_package(ASIO REQUIRED)
 
 include_directories(${PROJECT_SOURCE_DIR}/shared_src
-		    ${serial_driver_INCLUDE_DIRS})
+  ${PROJECT_SOURCE_DIR}/rosa_driver
+	${serial_driver_INCLUDE_DIRS})
 
 file(GLOB SOURCE_FILES
  ${PROJECT_SOURCE_DIR}/rosa_driver/*.cpp
  )
-add_executable(rosa_driver ${SOURCE_FILES})
+#add_executable(rosa_driver ${SOURCE_FILES})
+add_executable(rosa_simple_test  rosa_driver/main.cpp)
+ament_target_dependencies(rosa_simple_test rclcpp std_msgs)
+
+add_executable(rosa_driver 
+  rosa_driver/driver_node.cpp
+  rosa_driver/rosa_driver.cpp
+  rosa_driver/rosa_port.cpp
+)
 ament_target_dependencies(rosa_driver io_context serial_driver rclcpp geometry_msgs nav_msgs  tf2_geometry_msgs)
 
 #add_executable(fake_rosa_driver fake_rosa_driver_node.cpp)
@@ -38,6 +47,7 @@ ament_target_dependencies(rosa_driver io_context serial_driver rclcpp geometry_m
 
 install(TARGETS
   rosa_driver
+  rosa_simple_test
   #fake_driver_node
   DESTINATION lib/${PROJECT_NAME}
 )

@@ -73,7 +73,8 @@ namespace SPS
         void write_crc() { crc = crc16(data + FULLHEADER_SIZE, size); }
         bool check_crc() { return crc == crc16(data + FULLHEADER_SIZE, size);}
         uint16_t datagram_size() const { return size + FULLHEADER_SIZE;}
-
+        const uchar_t *begin() const {return data;}
+        const uchar_t *end() const {return data + size + FULLHEADER_SIZE;}
         //info generic writters and readers
         template <typename T, typename TT = T> //a trick to forze explicit type specification
         bool write(TT var) {

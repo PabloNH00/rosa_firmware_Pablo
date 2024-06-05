@@ -9,7 +9,7 @@ set(CMAKE_AUTORCC ON)
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 find_package(ament_cmake REQUIRED)
 include(qt_interface/CMakeLists.txt)
-#include(rosa_driver/CMakeLists.txt)
+include(rosa_driver/CMakeLists.txt)
 
 
 
