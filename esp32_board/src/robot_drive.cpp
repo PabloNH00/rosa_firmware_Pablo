@@ -69,13 +69,25 @@ void RobotDrive::command_speed(){
   rc_left.set_speeds(target_velocity[m1_left].t_int, target_velocity[m2_left].t_int);
   rc_right.set_speeds(target_velocity[m1_right].t_int, target_velocity[m2_right].t_int);
 }
+//if there are roboclaw errors...or a reset is sent: check if velocity tends to 0 also
 void  RobotDrive::read_speeds()
 {
-  if(mock_hardware)return;
-  if(!rc_left.read_speeds(current_velocity[0].t_int,current_velocity[1].t_int))
-    WIFI_DEBUG("ERROR reading left speed");
-  if(!rc_right.read_speeds(current_velocity[2].t_int,current_velocity[3].t_int))
-    WIFI_DEBUG("ERROR reading rigt speed");
+  bool left{},right{};
+  float vangs[4]{}; //rads/sec
+  if(mock_hardware){
+    //twist emulation : we use the current_velocity emulation computed by encs
+    for(int i=0;i<4;i++)vangs[i]=(current_velocity[i].t_int)*CPR_2_RADS;
+    FK(vangs,vx, vy, vyaw);
+    return;
+  }
+  left = rc_left.read_speeds(current_velocity[0].t_int,current_velocity[1].t_int);
+  right = rc_right.read_speeds(current_velocity[2].t_int,current_velocity[3].t_int);
+  if(!left)WIFI_DEBUG("ERROR reading left speed");
+  if(!right)WIFI_DEBUG("ERROR reading rigt speed");
+  if(left && right){//compute robot twist
+     for(int i=0;i<4;i++)vangs[i]=(current_velocity[i].t_int)*CPR_2_RADS;
+     FK(vangs,vx, vy, vyaw);
+  }
 }
 //if needed it is possible to deal  with overflows and unerflows (use ReqdM1Encoder instead)
 //overflow, underflow will happen after 84Km so probably it is not neccesary

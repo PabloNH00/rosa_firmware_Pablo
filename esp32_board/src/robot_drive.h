@@ -55,6 +55,7 @@ class RobotDrive{
     float battery_voltage=0;
     int32_u encoder_counts[4]{};
     float x_pos,y_pos,yaw;
+    float vx,vy,vyaw;
     //commanded
     int32_u target_velocity[4]{};
     void read_encoders();
