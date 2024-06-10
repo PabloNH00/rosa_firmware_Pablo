@@ -112,7 +112,33 @@ namespace ROSA{
         transform_msg.transform.rotation=quat;
         if(odom_broadcaster)odom_broadcaster->sendTransform(transform_msg);
       }
-
+      if(m.id == ROSA_ODOMETRY_EXTENDED){
+        float pos_x=m.read<float>();
+        float pos_y=m.read<float>();
+        float yaw=m.read<float>();
+        float lin_vel_x=m.read<float>();
+        float lin_vel_y=m.read<float>();
+        float ang_vel_z=m.read<float>();
+ 
+        auto quat = tf2::toMsg(tf2::Quaternion(tf2::Vector3(0.0, 0.0, 1.0), yaw));
+        auto stamp = now();
+        odom_msg.header.stamp = stamp;
+        odom_msg.pose.pose.position.x = pos_x;
+        odom_msg.pose.pose.position.y = pos_y;
+        odom_msg.pose.pose.position.z = 0;
+        odom_msg.pose.pose.orientation = quat;
+        odom_msg.twist.twist.linear.x = lin_vel_x;
+        odom_msg.twist.twist.linear.y = lin_vel_y;
+        odom_msg.twist.twist.angular.z = ang_vel_z;
+        if(odometry_pub)odometry_pub->publish(odom_msg);
+        
+        transform_msg.header.stamp = stamp;
+        transform_msg.transform.translation.x=pos_x;
+        transform_msg.transform.translation.y=pos_y;
+        transform_msg.transform.translation.z=0;
+        transform_msg.transform.rotation=quat;
+        if(odom_broadcaster)odom_broadcaster->sendTransform(transform_msg);
+      }
     }
 
   }
