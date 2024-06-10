@@ -86,6 +86,14 @@ void MainWindow::process_message(ROSAmens &m)
         ui->odom_y->display(QString::number(m.read<float>(), 'f', 3));
         ui->odom_yaw->display(QString::number(m.read<float>(), 'f', 3));
         break;
+    case ROSA_ODOMETRY_EXTENDED:
+        ui->odom_x->display(QString::number(m.read<float>(), 'f', 3));
+        ui->odom_y->display(QString::number(m.read<float>(), 'f', 3));
+        ui->odom_yaw->display(QString::number(m.read<float>(), 'f', 3));
+        ui->odom_vx->display(QString::number(m.read<float>(), 'f', 3));
+        ui->odom_vy->display(QString::number(m.read<float>(), 'f', 3));
+        ui->odom_vyaw->display(QString::number(m.read<float>(), 'f', 3));
+        break;
     }
 }
 void MainWindow::update_robot_data(const RobotData &data){

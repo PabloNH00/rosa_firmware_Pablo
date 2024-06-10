@@ -44,6 +44,14 @@ struct Odometry{
   float y_pos=0;
   float yaw=0;
 };
+struct ExtendedOdometry{
+  float x_pos=0;
+  float y_pos=0;
+  float yaw=0;
+  float vx=0;
+  float vy=0;
+  float vyaw=0;
+};
 
 class RobotDrive{
     RoboClawDriver rc_left{RC_LEFT_PORT, RC_BAUD_RATE, RC_ID};
@@ -73,6 +81,7 @@ class RobotDrive{
    void reset_odometry();
    void enable(bool en=true){mock_hardware=!en;}
    Odometry get_odometry(){return Odometry{x_pos, y_pos, yaw};}
+   ExtendedOdometry get_extended_odometry(){return ExtendedOdometry{x_pos, y_pos, yaw, vx, vy, vyaw};}
    RobotData get_robot_data();
    static void FK(const float v[4], float &vx, float &vy, float &vr);
    static void IK(const float &vx, const float &vy, const float &vr, float vm[4]);

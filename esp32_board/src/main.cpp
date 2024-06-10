@@ -23,8 +23,10 @@ void send_wifi_regular_messages()
 {
 if(!RosaWiFi::isConected2Master())return;
 RosaWiFi::sendMessage(robot_data_message(robot.get_robot_data()));
-auto [x, y,yaw] = robot.get_odometry();
-RosaWiFi::sendMessage(odometry_message(x, y,yaw));
+//auto [x, y,yaw] = robot.get_odometry();
+//RosaWiFi::sendMessage(odometry_message(x, y,yaw));
+auto [x, y,yaw, vx,vy,vyaw] = robot.get_extended_odometry();
+RosaWiFi::sendMessage(extended_odometry_message(x,y,yaw,vx,vy,vyaw));
 }
 void setup()
  {
@@ -52,9 +54,12 @@ void setup()
     if(update_ros())//send odometry and status data to ros2
     {
         //deberia incluir un timeout que detecte si hay comunicacion
-        auto [x, y,yaw] = robot.get_odometry();
+        
         //DEBUG_PRINTF("x:%5.2F y:%5.2f yaw:%5.2F",x,y,yaw);
-        send_message(odometry_message(x,y,yaw));
+        //auto [x, y,yaw] = robot.get_odometry();
+        //send_message(odometry_message(x,y,yaw));
+        auto [x, y,yaw, vx,vy,vyaw] = robot.get_extended_odometry();
+        send_message(extended_odometry_message(x,y,yaw,vx,vy,vyaw));
         
     }
     if(update_wifi())send_wifi_regular_messages();

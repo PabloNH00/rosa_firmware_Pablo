@@ -9,6 +9,7 @@ typedef SPS::Message<> ROSAmens;
 //ROSA ROS driver messages IDs
 //ROSA->ROS2
 #define ROSA_ODOMETRY 0x01
+#define ROSA_ODOMETRY_EXTENDED 0x02
 #define ROSA_DEBUG_TXT 0x10
 
 //ROS2->ROSA
@@ -43,6 +44,17 @@ inline ROSAmens odometry_message(float x, float y, float yaw)
     m.write<float>(x);
     m.write<float>(y);
     m.write<float>(yaw);
+    return m;
+}
+inline ROSAmens extended_odometry_message(float x, float y, float yaw, float vx, float vy, float vyaw)
+{
+    ROSAmens m(ROSA_ODOMETRY_EXTENDED);
+    m.write<float>(x);
+    m.write<float>(y);
+    m.write<float>(yaw);
+    m.write<float>(vx);
+    m.write<float>(vy);
+    m.write<float>(vyaw);
     return m;
 }
 inline ROSAmens cmd_vel_message(float vx, float vy, float vyaw)
