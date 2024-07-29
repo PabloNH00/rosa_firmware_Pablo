@@ -37,7 +37,7 @@ namespace ROSA{
     ///// PARAM4: odometry topic/////////////////////////////////
     odometry_topic = "odom";
     try {
-      frame_id = declare_parameter<string>("odometryTopic", odometry_topic);
+      odometry_topic = declare_parameter<string>("odometryTopic", odometry_topic);
     }catch (rclcpp::ParameterTypeException & ex) {
       RCLCPP_ERROR(get_logger(), "The odometry topic provided was invalid");
       throw ex;
@@ -68,6 +68,7 @@ namespace ROSA{
     odom_msg.child_frame_id = robot_frame_id;
     transform_msg.child_frame_id = robot_frame_id;
     odometry_pub = create_publisher<nav_msgs::msg::Odometry>("/" + odometry_topic, 2);
+    odom_broadcaster = std::make_shared<tf2_ros::TransformBroadcaster>(this);
 
     //suscriptors
     cmd_vel_sub = create_subscription<geometry_msgs::msg::Twist>("/" + cmd_topic, 
