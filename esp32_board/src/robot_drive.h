@@ -9,6 +9,7 @@ constexpr uint16_t ROBOT_DRIVER_WATCHDOG = 2000;
 //motors should work at 3K rpm as max
 //encoders 300 cpr  si es enc simple 15K si x4 60K
 constexpr int ENC_CPR  = 300;
+constexpr int ENC_FACTOR = 4; //4x enc
 constexpr int REDUCTION = 40;
 constexpr float MEC_RAD = 0.076F;
 constexpr float ROSA_LENGTH = 0.68181F;
@@ -20,7 +21,7 @@ constexpr float LXY = LX+LY;
 #define MAX_FORWARD_SPEED 2.5F //m/s
 #define MAX_LATERAL_SPEED 2.5F  //m/s
 #define MAX_ROT_SPEED 4.0F //rad/s
-constexpr float CPR_2_RADS = 3.1415F*2.0F/(ENC_CPR*REDUCTION);
+constexpr float CPR_2_RADS = 3.1415F*2.0F/(ENC_FACTOR * ENC_CPR * REDUCTION);
 constexpr float RADS_2_CPR = 1.0F/CPR_2_RADS;
 constexpr float factor_speed = 1;
 #define RC_LEFT_PORT Serial2
