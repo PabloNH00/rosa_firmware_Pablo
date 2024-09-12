@@ -30,16 +30,16 @@ void RobotDrive::emergency_stop(){
 //the loss of gdl have to be considered inb order to correctly test the IK
 inline void RobotDrive::FK(const float vm[4], float &vx, float &vy, float &vr)
 { 
-   vx=MEC_RAD*(vm[0]+vm[1]+vm[2]+vm[3])/4;
-    vr=MEC_RAD*(-vm[0]+vm[1]+vm[2]-vm[3])/4;
-    vy=MEC_RAD*(vm[0]-vm[1]+vm[2]-vm[3])/(4*LXY);
+    vx = MEC_RAD * (vm[0] + vm[1] + vm[2] + vm[3]) / 4;
+    vy = MEC_RAD * (vm[0] - vm[1] + vm[2] - vm[3]) / 4;
+    vr = MEC_RAD * (-vm[0] + vm[1] + vm[2] - vm[3]) / (4 * LXY);
 }
 inline void RobotDrive::IK(const float &vx, const float &vy, const float &vr, float vm[4])
 {
-  vm[0] = (vx -vr  +vy*LXY)/MEC_RAD; //vy+ ->vx+
-  vm[1] = (vx +vr  -vy*LXY)/MEC_RAD; //vx+ ->vy-
-  vm[2] = (vx +vr  +vy*LXY)/MEC_RAD; 
-  vm[3] = (vx -vr  -vy*LXY)/MEC_RAD;
+    vm[0] = (vx + vy - vr * LXY  ) / MEC_RAD; //vy+ ->vx+
+    vm[1] = (vx - vy + vr * LXY  ) / MEC_RAD; //vx+ ->vy-
+    vm[2] = (vx + vy + vr * LXY  ) / MEC_RAD;
+    vm[3] = (vx - vy - vr * LXY  ) / MEC_RAD;
 }
 //Sets the robot speed proportional to the maximun speeds (-1.0, 1.0)
 void RobotDrive::set_relative_velocity(float vx, float vy, float vr)
