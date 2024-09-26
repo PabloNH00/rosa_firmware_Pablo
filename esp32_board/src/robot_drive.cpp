@@ -32,14 +32,14 @@ inline void RobotDrive::FK(const float vm[4], float &vx, float &vy, float &vr)
 { 
     vx = MEC_RAD * (vm[0] + vm[1] + vm[2] + vm[3]) / 4;
     vy = MEC_RAD * (vm[0] - vm[1] + vm[2] - vm[3]) / 4;
-    vr = MEC_RAD * (-vm[0] + vm[1] + vm[2] - vm[3]) / (4 * LXY);
+    vr = MEC_RAD * (-vm[0] - vm[1] + vm[2] + vm[3]) / (4 * LXY);//-> 0 y 2 cambio signo
 }
 inline void RobotDrive::IK(const float &vx, const float &vy, const float &vr, float vm[4])
 {
-    vm[0] = (vx + vy - vr * LXY  ) / MEC_RAD; //vy+ ->vx+
-    vm[1] = (vx - vy + vr * LXY  ) / MEC_RAD; //vx+ ->vy-
-    vm[2] = (vx + vy + vr * LXY  ) / MEC_RAD;
-    vm[3] = (vx - vy - vr * LXY  ) / MEC_RAD;
+    vm[0] = (vx + vy - vr * LXY  ) / MEC_RAD; //vr - -> +
+    vm[1] = (vx - vy - vr * LXY  ) / MEC_RAD; 
+    vm[2] = (vx + vy + vr * LXY  ) / MEC_RAD;  //vr + -> -
+    vm[3] = (vx - vy + vr * LXY  ) / MEC_RAD;
 }
 //Sets the robot speed proportional to the maximun speeds (-1.0, 1.0)
 void RobotDrive::set_relative_velocity(float vx, float vy, float vr)
